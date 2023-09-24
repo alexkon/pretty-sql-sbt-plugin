@@ -1,0 +1,1 @@
+# pretty-sql-sbt-plugin
