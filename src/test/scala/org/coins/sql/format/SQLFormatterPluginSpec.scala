@@ -10,7 +10,34 @@ class SQLFormatterPluginSpec extends FlatSpec with Matchers {
     val expectedSQl =
       """
         |SELECT *
-        |FROM people"""
-    SQLFormatterPlugin.formatSQLString(inputSQL) shouldBe expectedSQl
+        |  FROM people"""
+    val actualFormattedString = SQLFormatterPlugin.formatSQLString(inputSQL)
+
+    actualFormattedString shouldBe expectedSQl
+  }
+
+  "formatSQLString function" should "return well formatted SQL String for filter statement" in {
+    val inputSQL = """select * from people where id = 1"""
+    val expectedSQl =
+      """
+        |SELECT *
+        |  FROM people
+        | WHERE id = 1"""
+    val actualFormattedString = SQLFormatterPlugin.formatSQLString(inputSQL)
+
+    actualFormattedString shouldBe expectedSQl
+  }
+
+  "formatSQLString function" should "return well formatted SQL String for GROUP BY statement" in {
+    val inputSQL = """select age, count(1) as total from people group by 1 order by 2 desc"""
+    val expectedSQl =
+      """
+        |SELECT age, count(1) as total
+        |  FROM people
+        | GROUP BY 1
+        | ORDER BY 2 desc"""
+    val actualFormattedString = SQLFormatterPlugin.formatSQLString(inputSQL)
+
+    actualFormattedString shouldBe expectedSQl
   }
 }

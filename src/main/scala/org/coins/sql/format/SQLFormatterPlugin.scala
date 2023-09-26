@@ -42,19 +42,29 @@ object SQLFormatterPlugin extends AutoPlugin {
   }
 
   def formatSQLString(sql: String): String = {
-    val keywords = Set("select", "from", "where", "left join", "inner join", "with", "group by", "order by", "and")
+    val keywords = Set("SELECT", "FROM", "WHERE", "LEFT", "RIGHT", "INNER", "JOIN", "WITH", "GROUP BY", "ORDER BY", "AND")
 
     val sqlMinified = sql.stripMargin.split("\n").map(line => line.trim).mkString("")
 
     // keywords to upper case
-    val sqlUpper = keywords.foldLeft(sqlMinified) { (acc, keyword) => acc.replace(keyword, s"${keyword.toUpperCase()}")}
+    val sqlUpper = keywords.map(_.toLowerCase).foldLeft(sqlMinified) { (acc, keyword) => acc.replace(keyword, s"${keyword.toUpperCase}")}
 
-
-    keywords
-      .map(_.toUpperCase())
+    val sqlKeyWordsNewLine = keywords
       .foldLeft(sqlUpper) { (acc, keyword) =>
         acc.replace(keyword, s"\n$keyword")
       }
-      .split("\n").map(line => line.trim).mkString("\n        |") // 8-space indentation with |
+      .split("\n")
+      .map(line => line.trim)
+      .mkString("\n")
+
+    val sqlKeyWordsAligned =  keywords
+      .foldLeft(sqlKeyWordsNewLine) { (acc, keyword) =>
+        val leftPadding = " " * ("SELECT".length - keyword.split(" ").head.length)
+        acc.replace(keyword, s"$leftPadding$keyword")
+      }
+      .split("\n")
+      .mkString("\n        |") // 8-space indentation with |
+
+    sqlKeyWordsAligned
   }
 }
