@@ -42,9 +42,19 @@ object SQLFormatterPlugin extends AutoPlugin {
   }
 
   def formatSQLString(sql: String): String = {
-    val keywords = Set("SELECT", "FROM", "WHERE", "LEFT JOIN", "INNER JOIN", "WITH", "GROUP BY", "ORDER BY", "AND", ",")
-    keywords.foldLeft(sql) { (acc, keyword) =>
-      acc.replace(keyword, s"\n$keyword")
-    }.split("\n").map(line => line.trim).mkString("\n    ") // 4-space indentation
+    val keywords = Set("select", "from", "where", "left join", "inner join", "with", "group by", "order by", "and")
+
+    val sqlMinified = sql.stripMargin.split("\n").map(line => line.trim).mkString("")
+
+    // keywords to upper case
+    val sqlUpper = keywords.foldLeft(sqlMinified) { (acc, keyword) => acc.replace(keyword, s"${keyword.toUpperCase()}")}
+
+
+    keywords
+      .map(_.toUpperCase())
+      .foldLeft(sqlUpper) { (acc, keyword) =>
+        acc.replace(keyword, s"\n$keyword")
+      }
+      .split("\n").map(line => line.trim).mkString("\n        |") // 8-space indentation with |
   }
 }
