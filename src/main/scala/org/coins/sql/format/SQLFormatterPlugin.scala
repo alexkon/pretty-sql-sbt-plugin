@@ -6,7 +6,7 @@ import sbt._
 object SQLFormatterPlugin extends AutoPlugin {
 
   object autoImport {
-    val formatSQL = taskKey[Unit]("Format SQL embedded in Scala strings")
+    val formatSQL = inputKey[Unit]("Format SQL embedded in Scala strings, optionally in a specified file.")
   }
 
   import autoImport._
@@ -17,19 +17,30 @@ object SQLFormatterPlugin extends AutoPlugin {
     formatSQL := {
       val log = streams.value.log
       val baseDir = baseDirectory.value
-      formatScalaFiles(baseDir, log)
+      val inputFileName = Def.spaceDelimited("<arg>").parsed.headOption
+
+      inputFileName match {
+        case Some(fileName) =>
+          val file = baseDir / fileName
+          if (file.exists() && fileName.endsWith(".scala")) {
+            formatScalaFile(file, log)
+          } else log.error(s"File $fileName does not exist or is not a Scala file")
+
+        case None => formatScalaFiles(baseDir, log)
+      }
     }
   )
 
   def formatScalaFiles(baseDir: File, log: Logger): Unit = {
-    val scalaFiles = baseDir ** "*.scala"
+    val scalaFiles = (baseDir ** "*.scala").get
+    scalaFiles.foreach(file => formatScalaFile(file, log))
+  }
 
-    scalaFiles.get.foreach { file =>
-      val content = IO.read(file)
-      val formattedContent = formatSQLInString(content)
-      IO.write(file, formattedContent)
-      log.info(s"Formatted SQL in $file")
-    }
+  def formatScalaFile(file: File, log: Logger): Unit = {
+    val content = IO.read(file)
+    val formattedContent = formatSQLInString(content)
+    IO.write(file, formattedContent)
+    log.info(s"Formatted SQL in $file")
   }
 
   def formatSQLInString(content: String): String = {

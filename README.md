@@ -12,7 +12,13 @@ addSbtPlugin("pretty-sql-sbt-plugin" % "pretty-sql-sbt-plugin" % "0.1.0")
 ```
 
 3. Run sbt-shell and execute task:
-```sbt
-formatSQL
-```
-All SQL code in Scala files should be formatted
+
+    Format all Scala files in current base directory:
+    ```sbt
+    formatSQL                                                 
+    ```
+    
+    Format only provided Scala file:
+    ```sbt
+    formatSQL src/main/scala/com/example/test/SqlTest.scala
+    ```
