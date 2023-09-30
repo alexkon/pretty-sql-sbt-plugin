@@ -17,4 +17,22 @@ class SQLFormatterSpec extends FlatSpec with Matchers {
 
     actualFormattedString shouldBe expectedSQl
   }
+
+  "keyWordsToUpper function" should "convert all keywords to upper string" in {
+    val inputSQL =
+      """
+        |Select *
+        |  From people
+        | where id = 1
+        | """.stripMargin
+    val expectedSQl =
+      """
+        |SELECT *
+        |  FROM people
+        | WHERE id = 1
+        | """.stripMargin
+    val actualFormattedString = SQLFormatter.keyWordsToUpper(inputSQL)
+
+    actualFormattedString shouldBe expectedSQl
+  }
 }

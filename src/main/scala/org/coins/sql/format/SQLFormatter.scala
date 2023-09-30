@@ -1,5 +1,7 @@
 package org.coins.sql.format
 
+import java.util.regex.Pattern
+
 object SQLFormatter {
 
   private val SQL_KEY_WORDS = Set("SELECT", "FROM", "WHERE", "LEFT", "RIGHT", "INNER", "JOIN", "WITH", "GROUP BY", "ORDER BY", "AND")
@@ -11,7 +13,7 @@ object SQLFormatter {
   def keyWordsToUpper(sql: String): String = {
     SQL_KEY_WORDS
       .map(_.toLowerCase)
-      .foldLeft(sql) { (acc, keyword) => acc.replace(keyword, s"${keyword.toUpperCase}") }
+      .foldLeft(sql) { (acc, keyword) => replaceAllCaseInsensitive(keyword, s"${keyword.toUpperCase}", acc) }
   }
 
   def keyWordsToNewLine(sql: String): String = {
@@ -32,5 +34,9 @@ object SQLFormatter {
       }
       .split("\n")
       .mkString("\n        |") // 8-space indentation with |
+  }
+
+  private def replaceAllCaseInsensitive(regex: String, replacement: String, target: String): String = {
+    Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher(target).replaceAll(replacement)
   }
 }
