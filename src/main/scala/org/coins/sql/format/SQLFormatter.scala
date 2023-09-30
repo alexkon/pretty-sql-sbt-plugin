@@ -5,7 +5,7 @@ object SQLFormatter {
   private val SQL_KEY_WORDS = Set("SELECT", "FROM", "WHERE", "LEFT", "RIGHT", "INNER", "JOIN", "WITH", "GROUP BY", "ORDER BY", "AND")
 
   def minifySqlString(sql: String): String = {
-    sql.stripMargin.split("\n").map(line => line.trim).mkString("")
+    sql.stripMargin.split("\n").map(line => line.trim).mkString(" ").trim
   }
 
   def keyWordsToUpper(sql: String): String = {
