@@ -22,13 +22,13 @@ class SQLFormatterSpec extends FlatSpec with Matchers {
     val inputSQL =
       """
         |Select *
-        |  From people
+        |  From selection
         | where id = 1
         | """.stripMargin
     val expectedSQl =
       """
         |SELECT *
-        |  FROM people
+        |  FROM selection
         | WHERE id = 1
         | """.stripMargin
     val actualFormattedString = SQLFormatter.keyWordsToUpper(inputSQL)

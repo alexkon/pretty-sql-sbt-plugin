@@ -13,7 +13,7 @@ object SQLFormatter {
   def keyWordsToUpper(sql: String): String = {
     SQL_KEY_WORDS
       .map(_.toLowerCase)
-      .foldLeft(sql) { (acc, keyword) => replaceAllCaseInsensitive(keyword, s"${keyword.toUpperCase}", acc) }
+      .foldLeft(sql) { (acc, keyword) => wordToUpperCase(keyword, acc) }
   }
 
   def keyWordsToNewLine(sql: String): String = {
@@ -38,5 +38,9 @@ object SQLFormatter {
 
   private def replaceAllCaseInsensitive(regex: String, replacement: String, target: String): String = {
     Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher(target).replaceAll(replacement)
+  }
+
+  private def wordToUpperCase(keyword: String, target: String): String = {
+    replaceAllCaseInsensitive(s"\\b$keyword\\b", s"${keyword.toUpperCase}", target)
   }
 }
