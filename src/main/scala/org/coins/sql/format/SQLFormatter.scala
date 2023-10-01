@@ -1,6 +1,6 @@
 package org.coins.sql.format
 
-import org.coins.sql.format.regex.RegexHelper.{wordToUpperCase, wordToNewLine}
+import org.coins.sql.format.regex.RegexHelper.{wordToUpperCase, wordToNewLine, lastWordToNewLineIfNotOnlyOne}
 
 object SQLFormatter {
 
@@ -27,6 +27,10 @@ object SQLFormatter {
       .split("\n")
       .map(line => line.trim)
       .mkString("\n")
+  }
+
+  def emptyLineBeforeLastSelectIfNotOnlyOne(sql: String): String = {
+    lastWordToNewLineIfNotOnlyOne("SELECT", sql)
   }
 
   def keyWordsAligned(sql: String, leftIndent: String = DEFAULT_LEFT_INDENT): String = {

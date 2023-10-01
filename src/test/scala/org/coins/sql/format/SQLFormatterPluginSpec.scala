@@ -57,4 +57,27 @@ ${customLeftIndent}  FROM people"""
     val actualFormattedString = SQLFormatterPlugin.formatSQLString(inputSQL)
     actualFormattedString shouldBe expectedSQl
   }
+
+  "formatSQLString function" should "return well formatted SQL String with empty line before last SELECT" in {
+    val inputSQL =
+      """
+        |  WITH base as (
+        |SELECT *
+        |  FROM people)
+        |SELECT id
+        |  FROM base
+        |""".stripMargin
+
+    val expectedSQl =
+      """
+        |  WITH base as (
+        |SELECT *
+        |  FROM people)
+        |
+        |SELECT id
+        |  FROM base"""
+    val actualFormattedString = SQLFormatterPlugin.formatSQLString(inputSQL)
+
+    actualFormattedString shouldBe expectedSQl
+  }
 }
