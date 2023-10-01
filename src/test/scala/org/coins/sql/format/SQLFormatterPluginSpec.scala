@@ -2,6 +2,7 @@ package org.coins.sql.format
 
 import org.scalatest.flatspec.{AnyFlatSpec => FlatSpec}
 import org.scalatest.matchers.should.Matchers
+import scala.util.Random
 
 class SQLFormatterPluginSpec extends FlatSpec with Matchers {
 
@@ -38,6 +39,22 @@ class SQLFormatterPluginSpec extends FlatSpec with Matchers {
         | ORDER BY 2 desc"""
     val actualFormattedString = SQLFormatterPlugin.formatSQLString(inputSQL)
 
+    actualFormattedString shouldBe expectedSQl
+  }
+
+  "formatSQLString function" should "return well formatted SQL String with custom left indent" in {
+    val randomNumberFrom1to10 = Random.nextInt(10) + 1
+    val customLeftIndent = " " * randomNumberFrom1to10 + "|"
+
+    val inputSQL = s"""
+${customLeftIndent}select * from people
+${customLeftIndent}"""
+
+    val expectedSQl = s"""
+${customLeftIndent}SELECT *
+${customLeftIndent}  FROM people"""
+
+    val actualFormattedString = SQLFormatterPlugin.formatSQLString(inputSQL)
     actualFormattedString shouldBe expectedSQl
   }
 }

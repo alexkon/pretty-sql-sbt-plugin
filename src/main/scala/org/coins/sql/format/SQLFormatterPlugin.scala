@@ -55,11 +55,13 @@ object SQLFormatterPlugin extends AutoPlugin {
   def formatSQLString(sql: String): String = {
     import SQLFormatter._
 
+    val customLeftIndent: Option[String] = findCustomLeftIndent(sql)
+
     Some(sql)
       .map(minifySqlString)
       .map(keyWordsToUpper)
       .map(keyWordsToNewLine)
-      .map(keyWordsAligned)
+      .map(s => customLeftIndent.map(leftIndent => keyWordsAligned(s, leftIndent)).getOrElse(keyWordsAligned(s)))
       .getOrElse(throw new RuntimeException("Unexpected behaviour: please contact to developers!"))
   }
 }

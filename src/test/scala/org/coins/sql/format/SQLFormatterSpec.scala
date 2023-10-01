@@ -47,4 +47,35 @@ class SQLFormatterSpec extends FlatSpec with Matchers {
 
     actualFormattedString shouldBe expectedSQl
   }
+
+  "keyWordsAligned function" should "return multiline SQL string with default aligned indent" in {
+    val inputSQL =
+      """
+        |SELECT *
+        |FROM SELECTION
+        |WHERE id = 1""".stripMargin
+    val expectedSQl =
+      """
+        |SELECT *
+        |  FROM SELECTION
+        | WHERE id = 1"""
+    val actualFormattedString = SQLFormatter.keyWordsAligned(inputSQL)
+
+    actualFormattedString shouldBe expectedSQl
+  }
+
+  "keyWordsAligned function" should "return multiline SQL string with custom aligned indent" in {
+    val inputSQL =
+      """
+        |SELECT *
+        |FROM SELECTION
+        |WHERE id = 1""".stripMargin
+    val expectedSQl ="""
+   |SELECT *
+   |  FROM SELECTION
+   | WHERE id = 1"""
+    val actualFormattedString = SQLFormatter.keyWordsAligned(inputSQL, leftIndent = "   |")
+
+    actualFormattedString shouldBe expectedSQl
+  }
 }
