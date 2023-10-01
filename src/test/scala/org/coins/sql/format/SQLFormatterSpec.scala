@@ -35,4 +35,16 @@ class SQLFormatterSpec extends FlatSpec with Matchers {
 
     actualFormattedString shouldBe expectedSQl
   }
+
+  "keyWordsToNewLine function" should "return multiline SQL string where each keyword started with new line" in {
+    val inputSQL = "SELECT * FROM SELECTION WHERE id = 1"
+    val expectedSQl =
+      """
+        |SELECT *
+        |FROM SELECTION
+        |WHERE id = 1""".stripMargin
+    val actualFormattedString = SQLFormatter.keyWordsToNewLine(inputSQL)
+
+    actualFormattedString shouldBe expectedSQl
+  }
 }
