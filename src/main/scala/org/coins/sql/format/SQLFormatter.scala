@@ -1,6 +1,6 @@
 package org.coins.sql.format
 
-import java.util.regex.Pattern
+import org.coins.sql.format.regex.RegexHelper.{wordToUpperCase, wordToNewLine}
 
 object SQLFormatter {
 
@@ -18,8 +18,7 @@ object SQLFormatter {
 
   def keyWordsToNewLine(sql: String): String = {
     SQL_KEY_WORDS
-      .foldLeft(sql) { (acc, keyword) => keywordToNewLine(keyword, acc) }
-//      .foldLeft(sql) { (acc, keyword) => acc.replace(keyword, s"\n$keyword") }
+      .foldLeft(sql) { (acc, keyword) => wordToNewLine(keyword, acc) }
       .split("\n")
       .map(line => line.trim)
       .mkString("\n")
@@ -33,13 +32,5 @@ object SQLFormatter {
       }
       .split("\n")
       .mkString("\n        |") // 8-space indentation with |
-  }
-
-  private def wordToUpperCase(keyword: String, target: String): String = {
-    s"(?i)\\b$keyword\\b".r.replaceAllIn(target, _ => s"${keyword.toUpperCase}")
-  }
-
-  private def keywordToNewLine(keyword: String, target: String): String = {
-    s"\\b$keyword\\b".r.replaceAllIn(target, _ => s"\n$keyword")
   }
 }
