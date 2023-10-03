@@ -38,7 +38,7 @@ object SQLFormatter {
     lastWordToNewLineIfNotOnlyOne("SELECT", sql)
   }
 
-  def keyWordsAligned(sql: String, leftIndent: String = DEFAULT_LEFT_INDENT): String = {
+  def keyWordsAligned(sql: String, leftIndent: Option[String] = None): String = {
     SQL_KEY_WORDS_STARTED_WITH_NEW_LINE
       .foldLeft(sql) { (acc, keyword) =>
         val leftSpacePadding = if (SQL_KEY_WORDS_LEFT_ALIGNED.contains(keyword)) {
@@ -51,6 +51,6 @@ object SQLFormatter {
         replaceWord(keyword, s"$leftSpacePadding$keyword", acc)
       }
       .split("\n")
-      .mkString(s"\n$leftIndent")
+      .mkString(s"\n${leftIndent.getOrElse(DEFAULT_LEFT_INDENT)}")
   }
 }

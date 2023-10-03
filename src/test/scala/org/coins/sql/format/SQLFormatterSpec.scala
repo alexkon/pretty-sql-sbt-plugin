@@ -74,7 +74,7 @@ class SQLFormatterSpec extends FlatSpec with Matchers {
    |SELECT *
    |  FROM SELECTION
    | WHERE id = 1"""
-    val actualFormattedString = SQLFormatter.keyWordsAligned(inputSQL, leftIndent = "   |")
+    val actualFormattedString = SQLFormatter.keyWordsAligned(inputSQL, leftIndent = Some("   |"))
 
     actualFormattedString shouldBe expectedSQl
   }

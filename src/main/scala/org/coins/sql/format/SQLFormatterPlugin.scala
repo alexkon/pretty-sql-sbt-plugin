@@ -62,7 +62,7 @@ object SQLFormatterPlugin extends AutoPlugin {
       .map(keyWordsToUpper)
       .map(keyWordsToNewLine)
       .map(emptyLineBeforeLastSelectIfNotOnlyOne)
-      .map(s => customLeftIndent.map(leftIndent => keyWordsAligned(s, leftIndent)).getOrElse(keyWordsAligned(s)))
+      .map(s => keyWordsAligned(s, customLeftIndent))
       .getOrElse(throw new RuntimeException("Unexpected behaviour: please contact to developers!"))
   }
 }
