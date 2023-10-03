@@ -75,7 +75,7 @@ object SQLFormatter {
   }
 
   def formatSelectLine(line: String, selectPrefix: Option[String]): String = {
-    val parenthesesStack = Stack[Char]() // TODO: check if works with immuatable
+    val parenthesesStack = Stack[Char]()
     var formattedLine = new StringBuilder
 
     for (ch <- line) {
