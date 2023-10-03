@@ -8,7 +8,7 @@ publishLocal
 
 2. Add plugin to your project by adding new line in file `project/plugins.sbt`:
 ```sbt
-addSbtPlugin("pretty-sql-sbt-plugin" % "pretty-sql-sbt-plugin" % "0.1.4")
+addSbtPlugin("pretty-sql-sbt-plugin" % "pretty-sql-sbt-plugin" % "0.1.6")
 ```
 
 3. Run sbt-shell and execute task:

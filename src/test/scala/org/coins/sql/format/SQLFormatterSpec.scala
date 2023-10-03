@@ -74,7 +74,7 @@ class SQLFormatterSpec extends FlatSpec with Matchers {
    |SELECT *
    |  FROM SELECTION
    | WHERE id = 1"""
-    val actualFormattedString = SQLFormatter.keyWordsAligned(inputSQL, leftIndent = "   |")
+    val actualFormattedString = SQLFormatter.keyWordsAligned(inputSQL, leftIndent = Some("   |"))
 
     actualFormattedString shouldBe expectedSQl
   }
@@ -99,6 +99,22 @@ class SQLFormatterSpec extends FlatSpec with Matchers {
         |       AND id = 1
         |       AND age > 0"""
     val actualFormattedString = SQLFormatter.keyWordsAligned(inputSQL)
+
+    actualFormattedString shouldBe expectedSQl
+  }
+
+  "selectFieldsToNewLine function" should "put new line after each field with appropriate indent" in {
+    val inputSQL =
+      """
+        |SELECT id, cast(coalesce(age, 0) as int) as age, name
+        |  FROM USERS""".stripMargin
+    val expectedSQl =
+      """
+        |SELECT id,
+        |       cast(coalesce(age, 0) as int) as age,
+        |       name
+        |  FROM USERS""".stripMargin
+    val actualFormattedString = SQLFormatter.selectFieldsToNewLine(inputSQL)
 
     actualFormattedString shouldBe expectedSQl
   }
