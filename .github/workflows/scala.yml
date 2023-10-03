@@ -12,7 +12,7 @@ on:
     branches: [ "main" ]
 
 permissions:
-  contents: read
+  contents: write # this permission is needed to submit the dependency graph
 
 jobs:
   build:
