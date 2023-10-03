@@ -63,7 +63,7 @@ object SQLFormatterPlugin extends AutoPlugin {
       .map(keyWordsToNewLine)
       .map(emptyLineBeforeLastSelectIfNotOnlyOne)
       .map(keyWordsAligned(_, customLeftIndent))
-      .flatMap(_ => None)
+      .map(selectFieldsToNewLine)
       .getOrElse(throw new RuntimeException("Unexpected behaviour: function `formatSQLString` should return String!"))
   }
 }

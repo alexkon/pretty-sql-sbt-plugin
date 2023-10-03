@@ -33,7 +33,8 @@ class SQLFormatterPluginSpec extends FlatSpec with Matchers {
     val inputSQL = """select age, count(1) as total from people group by 1 order by 2 desc"""
     val expectedSQl =
       """
-        |SELECT age, count(1) AS total
+        |SELECT age,
+        |       count(1) AS total
         |  FROM people
         | GROUP BY 1
         | ORDER BY 2 DESC"""
