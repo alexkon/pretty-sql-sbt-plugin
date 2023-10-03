@@ -78,4 +78,28 @@ class SQLFormatterSpec extends FlatSpec with Matchers {
 
     actualFormattedString shouldBe expectedSQl
   }
+
+  "keyWordsAligned function" should "return well aligned SQL string with 'AND' and 'ON' keywords" in {
+    val inputSQL =
+      """
+        |SELECT *
+        |FROM USERS
+        |LEFT JOIN SYSTEM_USERS
+        |ON USERS.id = SYSTEM_USERS.id
+        |WHERE 1=1
+        |AND id = 1
+        |AND age > 0""".stripMargin
+    val expectedSQl =
+      """
+        |SELECT *
+        |  FROM USERS
+        |  LEFT JOIN SYSTEM_USERS
+        |       ON USERS.id = SYSTEM_USERS.id
+        | WHERE 1=1
+        |       AND id = 1
+        |       AND age > 0"""
+    val actualFormattedString = SQLFormatter.keyWordsAligned(inputSQL)
+
+    actualFormattedString shouldBe expectedSQl
+  }
 }

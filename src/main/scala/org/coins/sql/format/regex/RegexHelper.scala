@@ -2,6 +2,10 @@ package org.coins.sql.format.regex
 
 object RegexHelper {
 
+  def replaceWord(wordOld: String, wordNew: String, target: String): String = {
+    s"\\b$wordOld\\b".r.replaceAllIn(target, wordNew)
+  }
+
   def wordToUpperCase(keyword: String, target: String): String = {
     s"(?i)\\b$keyword\\b".r.replaceAllIn(target, s"${keyword.toUpperCase}")
   }
