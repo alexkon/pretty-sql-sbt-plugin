@@ -1,17 +1,23 @@
 package org.coins.sql.format.regex
 
 object RegexHelper {
+  val KEY_INSENSITIVE_KEY = "(?i)"
 
-  def replaceWord(wordOld: String, wordNew: String, target: String): String = {
-    s"\\b$wordOld\\b".r.replaceAllIn(target, wordNew)
+  def replaceWord(wordOld: String, wordNew: String, target: String, isCaseInsensitive: Boolean = false): String = {
+    val pattern = if (isCaseInsensitive) {
+      s"$KEY_INSENSITIVE_KEY\\b$wordOld\\b".r
+    } else {
+      s"\\b$wordOld\\b".r
+    }
+    pattern.replaceAllIn(target, wordNew)
   }
 
   def wordToUpperCase(keyword: String, target: String): String = {
-    s"(?i)\\b$keyword\\b".r.replaceAllIn(target, s"${keyword.toUpperCase}")
+    replaceWord(keyword, s"${keyword.toUpperCase}", target, isCaseInsensitive = true)
   }
 
   def wordToNewLine(keyword: String, target: String): String = {
-    s"\\b$keyword\\b".r.replaceAllIn(target, s"\n$keyword")
+    replaceWord(keyword, s"\n$keyword", target)
   }
 
   def lastWordToNewLineIfNotOnlyOne(word: String, sql: String): String = {

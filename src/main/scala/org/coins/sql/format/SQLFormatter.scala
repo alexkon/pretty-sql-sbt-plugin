@@ -7,7 +7,7 @@ import scala.collection.mutable.Stack
 object SQLFormatter {
 
   private val SQL_KEY_WORDS_LEFT_ALIGNED  = Set("SELECT", "FROM", "WHERE", "LEFT JOIN", "RIGHT JOIN", "INNER JOIN", "WITH", "GROUP BY", "ORDER BY")
-  private val SQL_KEY_WORDS_RIGHT_ALIGNED = Set("AND", "ON", "OR")
+  private val SQL_KEY_WORDS_RIGHT_ALIGNED = Set("AND", "OR", "ON")
   private val SQL_KEY_WORDS_NOT_ALIGNED   = Set("ASC", "DESC", "AS")
 
   private val SQL_KEY_WORDS_STARTED_WITH_NEW_LINE = SQL_KEY_WORDS_LEFT_ALIGNED ++ SQL_KEY_WORDS_RIGHT_ALIGNED
