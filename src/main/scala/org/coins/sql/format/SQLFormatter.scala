@@ -92,4 +92,41 @@ object SQLFormatter {
     }
     formattedLine.toString()
   }
+
+  def formatSelectLineFunctional(line: String, selectPrefix: Option[String]): String = {
+    case class State(
+                      formattedLine: StringBuilder = new StringBuilder,
+                      parenthesesCount: Int = 0,
+                      skipSpaces: Boolean = false
+                    )
+
+    val initialState = State()
+
+    val finalState = line.foldLeft(initialState) { (state, char) =>
+      char match {
+        case '(' =>
+          state.copy(
+            formattedLine = state.formattedLine += char,
+            parenthesesCount = state.parenthesesCount + 1
+          )
+        case ')' =>
+          state.copy(
+            formattedLine = state.formattedLine += char,
+            parenthesesCount = state.parenthesesCount - 1
+          )
+        case ',' if state.parenthesesCount == 0 =>
+          state.copy(
+            formattedLine = state.formattedLine += char ++= "\n" + selectPrefix.getOrElse("") + (" " * "SELECT ".length),
+            skipSpaces = true
+          )
+        case _ if state.skipSpaces && char == ' ' => state // skip spaces
+        case _ => state.copy(
+          formattedLine = state.formattedLine += char,
+          skipSpaces = false
+        )
+      }
+    }
+
+    finalState.formattedLine.toString()
+  }
 }
