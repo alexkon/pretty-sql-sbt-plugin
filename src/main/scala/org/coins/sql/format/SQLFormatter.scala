@@ -86,7 +86,7 @@ object SQLFormatter {
       if (line(i) == ',' && parenthesesStack.isEmpty) {
         // Move index forward while space is encountered after a comma
         while (i + 1 < line.length && line(i + 1) == ' ') i += 1
-        formattedLine ++= "\n" + selectPrefix.getOrElse("") + "       "
+        formattedLine ++= "\n" + selectPrefix.getOrElse("") + (" " * "SELECT ".length)
       }
       i += 1 // Move index forward
     }
