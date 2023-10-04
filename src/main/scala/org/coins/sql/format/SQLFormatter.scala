@@ -7,7 +7,7 @@ import scala.collection.mutable.Stack
 object SQLFormatter {
 
   private val SQL_KEY_WORDS_LEFT_ALIGNED  = Set("SELECT", "FROM", "WHERE", "LEFT JOIN", "RIGHT JOIN", "INNER JOIN", "WITH", "GROUP BY", "ORDER BY")
-  private val SQL_KEY_WORDS_RIGHT_ALIGNED = Set("AND", "ON")
+  private val SQL_KEY_WORDS_RIGHT_ALIGNED = Set("AND", "OR", "ON")
   private val SQL_KEY_WORDS_NOT_ALIGNED   = Set("ASC", "DESC", "AS")
 
   private val SQL_KEY_WORDS_STARTED_WITH_NEW_LINE = SQL_KEY_WORDS_LEFT_ALIGNED ++ SQL_KEY_WORDS_RIGHT_ALIGNED
@@ -76,15 +76,19 @@ object SQLFormatter {
 
   def formatSelectLine(line: String, selectPrefix: Option[String]): String = {
     val parenthesesStack = Stack[Char]()
-    var formattedLine = new StringBuilder
+    val formattedLine = new StringBuilder
+    var i = 0
 
-    for (ch <- line) {
-      if (ch == '(') parenthesesStack.push(ch)
-      if (ch == ')') parenthesesStack.pop
-      formattedLine += ch
-      if (ch == ',' && parenthesesStack.isEmpty) {
-        formattedLine ++= "\n" + selectPrefix.getOrElse("") + " " * ("SELECT ".length - 1)
+    while (i < line.length) {
+      if (line(i) == '(') parenthesesStack.push(line(i))
+      if (line(i) == ')') parenthesesStack.pop()
+      formattedLine += line(i)
+      if (line(i) == ',' && parenthesesStack.isEmpty) {
+        // Move index forward while space is encountered after a comma
+        while (i + 1 < line.length && line(i + 1) == ' ') i += 1
+        formattedLine ++= "\n" + selectPrefix.getOrElse("") + (" " * "SELECT ".length)
       }
+      i += 1 // Move index forward
     }
     formattedLine.toString()
   }

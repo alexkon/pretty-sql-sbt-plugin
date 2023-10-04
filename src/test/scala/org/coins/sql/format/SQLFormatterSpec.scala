@@ -106,13 +106,14 @@ class SQLFormatterSpec extends FlatSpec with Matchers {
   "selectFieldsToNewLine function" should "put new line after each field with appropriate indent" in {
     val inputSQL =
       """
-        |SELECT id, cast(coalesce(age, 0) as int) as age, name
+        |SELECT id,cast(coalesce(age, 0) as int) as age, first_name,  last_name
         |  FROM USERS""".stripMargin
     val expectedSQl =
       """
         |SELECT id,
         |       cast(coalesce(age, 0) as int) as age,
-        |       name
+        |       first_name,
+        |       last_name
         |  FROM USERS""".stripMargin
     val actualFormattedString = SQLFormatter.selectFieldsToNewLine(inputSQL)
 
