@@ -1,6 +1,6 @@
 package org.coins.sql.format
 
-import org.coins.sql.format.regex.RegexHelper.{lastWordToNewLineIfNotOnlyOne, replaceWord, wordToNewLine, wordToUpperCase}
+import org.coins.sql.format.regex.RegexHelper._
 
 import scala.collection.mutable.Stack
 
@@ -95,5 +95,27 @@ object SQLFormatter {
     sql
       .split("\n")
       .mkString(s"\n${leftIndent.getOrElse(DEFAULT_LEFT_INDENT)}")
+  }
+
+  def cteAlignedByWithKeyword(sql: String): String = {
+    val isStartsWithKeywordWith = sql.stripMargin.replaceAll("\n", " ").trim.startsWith("WITH")
+    if (isStartsWithKeywordWith) {
+      val indent = " " * "WITH ".length
+      val firstMatchLineNumberWith = lineNumberWithFirstWordMatch("WITH", sql)
+      val lastMatchLineNumberSelect = lineNumberWithLastWordMatch("SELECT", sql)
+      (firstMatchLineNumberWith, lastMatchLineNumberSelect) match {
+        case (Some(start), Some(end)) => sql
+          .split("\n")
+          .zipWithIndex
+          .foldLeft(Seq.empty[String]) { case (res: Seq[String], (line: String, index: Int)) => {
+            val newLine = if (index > start && index < end && line.size > 0) s"$indent$line" else line
+            res :+ newLine
+          }}
+          .mkString("\n")
+        case _ => sql
+      }
+    } else {
+      sql
+    }
   }
 }

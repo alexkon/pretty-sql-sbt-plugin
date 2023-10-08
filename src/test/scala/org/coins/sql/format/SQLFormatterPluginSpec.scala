@@ -62,9 +62,9 @@ ${customLeftIndent}  FROM people"""
   "formatSQLString function" should "return well formatted SQL String with empty line before last SELECT" in {
     val inputSQL =
       """
-        |  WITH base as (
-        |SELECT *
-        |  FROM people)
+        |WITH base as (
+        |     SELECT *
+        |       FROM people)
         |SELECT id
         |  FROM base
         |""".stripMargin
@@ -72,8 +72,8 @@ ${customLeftIndent}  FROM people"""
     val expectedSQl =
       """
         |  WITH base AS (
-        |SELECT *
-        |  FROM people)
+        |     SELECT *
+        |       FROM people)
         |
         |SELECT id
         |  FROM base"""

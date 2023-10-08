@@ -135,4 +135,27 @@ class SQLFormatterSpec extends FlatSpec with Matchers {
 
     actualFormattedString shouldBe expectedSQl
   }
+
+  "cteAlignedByWithKeyword function" should "return well formatted SQL with right indent for CTE expressions" in {
+    val inputSQL =
+    """
+    |WITH base as (
+    |SELECT *
+    |  FROM people)
+    |
+    |SELECT id
+    |  FROM base""".stripMargin
+
+    val expectedSQl =
+      """
+        |WITH base as (
+        |     SELECT *
+        |       FROM people)
+        |
+        |SELECT id
+        |  FROM base""".stripMargin
+    val actualFormattedString = SQLFormatter.cteAlignedByWithKeyword(inputSQL)
+
+    actualFormattedString shouldBe expectedSQl
+  }
 }

@@ -1,5 +1,8 @@
 package org.coins.sql.format.regex
 
+import scala.annotation.tailrec
+import scala.util.matching.Regex
+
 object RegexHelper {
   val KEY_INSENSITIVE_KEY = "(?i)"
 
@@ -30,5 +33,34 @@ object RegexHelper {
       val (before, after) = (sql.substring(0, start), sql.substring(end))
       s"$before\n$word$after"
     } else sql
+  }
+
+  def lineNumberWithFirstWordMatch(word: String, sql: String): Option[Int] = {
+    @tailrec
+    def loop(lines: Seq[String], lineIndex: Int, pattern: Regex): Option[Int] = {
+      if (lineIndex >= lines.size) {
+        return None
+      } else {
+        val currentLine = lines(lineIndex)
+        pattern.findFirstMatchIn(currentLine) match {
+          case Some(_) => return Some(lineIndex)
+          case None => loop(lines, lineIndex + 1, pattern)
+        }
+      }
+    }
+
+    val pattern: Regex = s"\\b$word\\b".r
+    val lines = sql.split("\n")
+    loop(lines, 0, pattern)
+  }
+
+  def lineNumberWithLastWordMatch(word: String, sql: String): Option[Int] = {
+    val lines = sql.split("\n")
+    val sqlReversedLines = lines.reverse.mkString("\n")
+    val firstMatch = lineNumberWithFirstWordMatch(word, sqlReversedLines)
+    firstMatch match {
+      case Some(index) => Some(lines.size - 1 - index)
+      case None => firstMatch
+    }
   }
 }
