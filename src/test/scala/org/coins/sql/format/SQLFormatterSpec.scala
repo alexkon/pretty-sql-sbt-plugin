@@ -58,7 +58,7 @@ class SQLFormatterSpec extends FlatSpec with Matchers {
       """
         |SELECT *
         |  FROM SELECTION
-        | WHERE id = 1"""
+        | WHERE id = 1""".stripMargin
     val actualFormattedString = SQLFormatter.keyWordsAligned(inputSQL)
 
     actualFormattedString shouldBe expectedSQl
@@ -66,15 +66,16 @@ class SQLFormatterSpec extends FlatSpec with Matchers {
 
   "keyWordsAligned function" should "return multiline SQL string with custom aligned indent" in {
     val inputSQL =
-      """
-        |SELECT *
-        |FROM SELECTION
-        |WHERE id = 1""".stripMargin
-    val expectedSQl ="""
-   |SELECT *
-   |  FROM SELECTION
-   | WHERE id = 1"""
-    val actualFormattedString = SQLFormatter.keyWordsAligned(inputSQL, leftIndent = Some("   |"))
+    """
+    |SELECT *
+    |FROM SELECTION
+    |WHERE id = 1""".stripMargin
+    val expectedSQl =
+    """
+    |SELECT *
+    |  FROM SELECTION
+    | WHERE id = 1""".stripMargin
+    val actualFormattedString = SQLFormatter.keyWordsAligned(inputSQL)
 
     actualFormattedString shouldBe expectedSQl
   }
@@ -97,7 +98,7 @@ class SQLFormatterSpec extends FlatSpec with Matchers {
         |       ON USERS.id = SYSTEM_USERS.id
         | WHERE 1=1
         |       AND id = 1
-        |       AND age > 0"""
+        |       AND age > 0""".stripMargin
     val actualFormattedString = SQLFormatter.keyWordsAligned(inputSQL)
 
     actualFormattedString shouldBe expectedSQl
@@ -116,6 +117,21 @@ class SQLFormatterSpec extends FlatSpec with Matchers {
         |       last_name
         |  FROM USERS""".stripMargin
     val actualFormattedString = SQLFormatter.selectFieldsToNewLine(inputSQL)
+
+    actualFormattedString shouldBe expectedSQl
+  }
+
+  "applyCustomLeftIndent function" should "return multiline SQL string with custom aligned indent" in {
+    val inputSQL =
+      """
+        |SELECT *
+        |  FROM SELECTION
+        | WHERE id = 1""".stripMargin
+    val expectedSQl ="""
+   |SELECT *
+   |  FROM SELECTION
+   | WHERE id = 1"""
+    val actualFormattedString = SQLFormatter.applyCustomLeftIndent(inputSQL, leftIndent = Some("   |"))
 
     actualFormattedString shouldBe expectedSQl
   }

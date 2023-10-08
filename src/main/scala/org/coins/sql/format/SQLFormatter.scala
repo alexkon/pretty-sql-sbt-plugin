@@ -23,7 +23,7 @@ object SQLFormatter {
   }
 
   def minifySqlString(sql: String): String = {
-    sql.stripMargin.split("\n").map(line => line.trim).mkString(" ").trim
+    sql.stripMargin.split("\n").map(_.trim).mkString(" ").trim
   }
 
   def keyWordsToUpper(sql: String): String = {
@@ -44,7 +44,7 @@ object SQLFormatter {
     lastWordToNewLineIfNotOnlyOne("SELECT", sql)
   }
 
-  def keyWordsAligned(sql: String, leftIndent: Option[String] = None): String = {
+  def keyWordsAligned(sql: String): String = {
     SQL_KEY_WORDS_STARTED_WITH_NEW_LINE
       .foldLeft(sql) { (acc, keyword) =>
         val leftSpacePadding = if (SQL_KEY_WORDS_LEFT_ALIGNED.contains(keyword)) {
@@ -56,8 +56,6 @@ object SQLFormatter {
         }
         replaceWord(keyword, s"$leftSpacePadding$keyword", acc)
       }
-      .split("\n")
-      .mkString(s"\n${leftIndent.getOrElse(DEFAULT_LEFT_INDENT)}")
   }
 
 
@@ -91,5 +89,11 @@ object SQLFormatter {
       i += 1 // Move index forward
     }
     formattedLine.toString()
+  }
+
+  def applyCustomLeftIndent(sql: String, leftIndent: Option[String] = None): String = {
+    sql
+      .split("\n")
+      .mkString(s"\n${leftIndent.getOrElse(DEFAULT_LEFT_INDENT)}")
   }
 }
