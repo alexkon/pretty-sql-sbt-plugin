@@ -66,7 +66,8 @@ object SQLFormatter {
     .map { line =>
       if (line.stripMargin.trim.startsWith("SELECT")) {
         val selectPrefix = findPrefixForSelect(line)
-        formatSelectLine(line, selectPrefix)
+        val fieldIndent = selectPrefix.getOrElse("") + (" " * "SELECT ".length)
+        replaceHighLevelSymbol(line, ',', s",\n$fieldIndent")
       } else {
         line
       }
@@ -74,38 +75,20 @@ object SQLFormatter {
     .mkString("\n")
   }
 
-  def formatSelectLine(line: String, selectPrefix: Option[String]): String = {
+  def replaceHighLevelSymbol(input: String, source: Char, target: String): String = {
     val parenthesesStack = Stack[Char]()
     val formattedLine = new StringBuilder
     var i = 0
 
-    while (i < line.length) {
-      if (line(i) == '(') parenthesesStack.push(line(i))
-      if (line(i) == ')') parenthesesStack.pop()
-      formattedLine += line(i)
-      if (line(i) == ',' && parenthesesStack.isEmpty) {
+    while (i < input.length) {
+      if (input(i) == '(') parenthesesStack.push(input(i))
+      if (input(i) == ')') parenthesesStack.pop()
+      if (input(i) == source && parenthesesStack.isEmpty) {
         // Move index forward while space is encountered after a comma
-        while (i + 1 < line.length && line(i + 1) == ' ') i += 1
-        formattedLine ++= "\n" + selectPrefix.getOrElse("") + (" " * "SELECT ".length)
-      }
-      i += 1 // Move index forward
-    }
-    formattedLine.toString()
-  }
-
-  def emptyLineAfterHighLevelComma(line: String): String = {
-    val parenthesesStack = Stack[Char]()
-    val formattedLine = new StringBuilder
-    var i = 0
-
-    while (i < line.length) {
-      if (line(i) == '(') parenthesesStack.push(line(i))
-      if (line(i) == ')') parenthesesStack.pop()
-      formattedLine += line(i)
-      if (line(i) == ',' && parenthesesStack.isEmpty) {
-        // Move index forward while space is encountered after a comma
-        while (i + 1 < line.length && line(i + 1) == ' ') i += 1
-        formattedLine ++= "\n\n"
+        while (i + 1 < input.length && input(i + 1) == ' ') i += 1
+        formattedLine ++= target
+      } else {
+        formattedLine += input(i)
       }
       i += 1 // Move index forward
     }
@@ -145,6 +128,6 @@ object SQLFormatter {
       case Some((startIndex, _)) => sql.splitAt(startIndex)
       case None => (sql, "")
     }
-    emptyLineAfterHighLevelComma(withoutLastSelectSql) + lastSelectSql
+    replaceHighLevelSymbol(withoutLastSelectSql, ',', ",\n\n") + lastSelectSql
   }
 }
