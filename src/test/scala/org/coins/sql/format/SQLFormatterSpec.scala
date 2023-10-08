@@ -116,7 +116,7 @@ class SQLFormatterSpec extends FlatSpec with Matchers {
         |       first_name,
         |       last_name
         |  FROM USERS""".stripMargin
-    val actualFormattedString = SQLFormatter.selectFieldsToNewLine(inputSQL)
+    val actualFormattedString = SQLFormatter.selectFieldsAlignedToNewLine(inputSQL)
 
     actualFormattedString shouldBe expectedSQl
   }

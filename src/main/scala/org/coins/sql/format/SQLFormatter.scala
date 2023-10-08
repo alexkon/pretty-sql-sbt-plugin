@@ -61,7 +61,7 @@ object SQLFormatter {
   }
 
 
-  def selectFieldsToNewLine(sql: String): String = {
+  def selectFieldsAlignedToNewLine(sql: String): String = {
     sql.split("\n")
     .map { line =>
       if (line.stripMargin.trim.startsWith("SELECT")) {
