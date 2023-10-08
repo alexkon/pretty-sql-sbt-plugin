@@ -71,7 +71,7 @@ ${customLeftIndent}  FROM people"""
 
     val expectedSQl =
       """
-        |  WITH base AS (
+        |WITH base AS (
         |     SELECT *
         |       FROM people)
         |

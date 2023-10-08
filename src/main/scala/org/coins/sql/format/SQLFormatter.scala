@@ -6,12 +6,14 @@ import scala.collection.mutable.Stack
 
 object SQLFormatter {
 
-  private val SQL_KEY_WORDS_LEFT_ALIGNED  = Set("SELECT", "FROM", "WHERE", "LEFT JOIN", "RIGHT JOIN", "INNER JOIN", "WITH", "GROUP BY", "ORDER BY")
-  private val SQL_KEY_WORDS_RIGHT_ALIGNED = Set("AND", "OR", "ON")
-  private val SQL_KEY_WORDS_NOT_ALIGNED   = Set("ASC", "DESC", "AS")
+  private val SQL_KEY_WORDS_LEFT_ALIGNED             = Set("SELECT", "FROM", "WHERE", "LEFT JOIN", "RIGHT JOIN", "INNER JOIN", "GROUP BY", "ORDER BY")
+  private val SQL_KEY_WORDS_RIGHT_ALIGNED            = Set("AND", "OR", "ON")
+  private val SQL_KEY_WORDS_NOT_ALIGNED              = Set("WITH")
+  private val SQL_KEY_WORDS_NOT_ALIGNED_NOT_NEW_LINE = Set("ASC", "DESC", "AS")
 
-  private val SQL_KEY_WORDS_STARTED_WITH_NEW_LINE = SQL_KEY_WORDS_LEFT_ALIGNED ++ SQL_KEY_WORDS_RIGHT_ALIGNED
-  private val SQL_KEY_WORDS = SQL_KEY_WORDS_STARTED_WITH_NEW_LINE ++ SQL_KEY_WORDS_NOT_ALIGNED
+  private val SQL_KEY_WORDS_ALIGNED = SQL_KEY_WORDS_LEFT_ALIGNED ++ SQL_KEY_WORDS_RIGHT_ALIGNED
+  private val SQL_KEY_WORDS_STARTED_WITH_NEW_LINE = SQL_KEY_WORDS_ALIGNED ++ SQL_KEY_WORDS_NOT_ALIGNED
+  private val SQL_KEY_WORDS = SQL_KEY_WORDS_STARTED_WITH_NEW_LINE ++ SQL_KEY_WORDS_NOT_ALIGNED_NOT_NEW_LINE
   private val DEFAULT_LEFT_INDENT = " " * 8 + "|"  // 8-space indentation with |
 
   def findCustomLeftIndent(sql: String): Option[String] = {
@@ -45,7 +47,7 @@ object SQLFormatter {
   }
 
   def keyWordsAligned(sql: String): String = {
-    SQL_KEY_WORDS_STARTED_WITH_NEW_LINE
+    SQL_KEY_WORDS_ALIGNED
       .foldLeft(sql) { (acc, keyword) =>
         val leftSpacePadding = if (SQL_KEY_WORDS_LEFT_ALIGNED.contains(keyword)) {
           " " * ("SELECT".length - keyword.split(" ").head.length)
