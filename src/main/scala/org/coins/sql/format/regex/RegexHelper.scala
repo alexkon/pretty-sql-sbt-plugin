@@ -35,6 +35,16 @@ object RegexHelper {
     } else sql
   }
 
+  def lastWordMatchIndexes(word: String, sql: String): Option[(Int, Int)] = {
+    val pattern = s"\\b$word\\b".r
+    val matches = pattern.findAllMatchIn(sql).toList
+
+    if (matches.nonEmpty) {
+      val lastMatch = matches.last
+      Some((lastMatch.start, lastMatch.end))
+    } else None
+  }
+
   def lineNumberWithFirstWordMatch(word: String, sql: String): Option[Int] = {
     @tailrec
     def loop(lines: Seq[String], lineIndex: Int, pattern: Regex): Option[Int] = {

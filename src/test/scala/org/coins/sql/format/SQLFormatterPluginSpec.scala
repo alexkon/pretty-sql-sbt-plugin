@@ -81,4 +81,30 @@ ${customLeftIndent}  FROM people"""
 
     actualFormattedString shouldBe expectedSQl
   }
+
+  "formatSQLString function" should "return well formatted SQL with empty line separated cte" in {
+    val inputSQL =
+      """
+        |WITH base1 as (SELECT *FROM people),
+        |     base2 as (SELECT *FROM people)
+        |SELECT * FROM base1
+        |INNER JOIN base2 using(id)""".stripMargin
+
+    val expectedSQl =
+      """
+        |WITH base1 AS (
+        |     SELECT *
+        |       FROM people),
+        |
+        |     base2 AS (
+        |     SELECT *
+        |       FROM people)
+        |
+        |SELECT *
+        |  FROM base1
+        | INNER JOIN base2 using(id)"""
+    val actualFormattedString = SQLFormatterPlugin.formatSQLString(inputSQL)
+
+    actualFormattedString shouldBe expectedSQl
+  }
 }

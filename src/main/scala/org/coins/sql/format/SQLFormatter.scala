@@ -93,6 +93,25 @@ object SQLFormatter {
     formattedLine.toString()
   }
 
+  def emptyLineAfterHighLevelComma(line: String): String = {
+    val parenthesesStack = Stack[Char]()
+    val formattedLine = new StringBuilder
+    var i = 0
+
+    while (i < line.length) {
+      if (line(i) == '(') parenthesesStack.push(line(i))
+      if (line(i) == ')') parenthesesStack.pop()
+      formattedLine += line(i)
+      if (line(i) == ',' && parenthesesStack.isEmpty) {
+        // Move index forward while space is encountered after a comma
+        while (i + 1 < line.length && line(i + 1) == ' ') i += 1
+        formattedLine ++= "\n\n"
+      }
+      i += 1 // Move index forward
+    }
+    formattedLine.toString()
+  }
+
   def applyCustomLeftIndent(sql: String, leftIndent: Option[String] = None): String = {
     sql
       .split("\n")
@@ -119,5 +138,13 @@ object SQLFormatter {
     } else {
       sql
     }
+  }
+
+  def cteNewLineSeparated(sql: String): String = {
+    val (withoutLastSelectSql, lastSelectSql) = lastWordMatchIndexes("SELECT", sql) match {
+      case Some((startIndex, _)) => sql.splitAt(startIndex)
+      case None => (sql, "")
+    }
+    emptyLineAfterHighLevelComma(withoutLastSelectSql) + lastSelectSql
   }
 }

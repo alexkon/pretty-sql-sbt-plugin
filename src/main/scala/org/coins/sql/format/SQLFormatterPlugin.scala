@@ -60,6 +60,7 @@ object SQLFormatterPlugin extends AutoPlugin {
     Some(sql)
       .map(minifySqlString)
       .map(keyWordsToUpper)
+      .map(cteNewLineSeparated)
       .map(keyWordsToNewLine)
       .map(emptyLineBeforeLastSelectIfNotOnlyOne)
       .map(keyWordsAligned)
