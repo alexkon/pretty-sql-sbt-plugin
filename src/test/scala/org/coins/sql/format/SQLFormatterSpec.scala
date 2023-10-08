@@ -58,7 +58,7 @@ class SQLFormatterSpec extends FlatSpec with Matchers {
       """
         |SELECT *
         |  FROM SELECTION
-        | WHERE id = 1"""
+        | WHERE id = 1""".stripMargin
     val actualFormattedString = SQLFormatter.keyWordsAligned(inputSQL)
 
     actualFormattedString shouldBe expectedSQl
@@ -66,15 +66,16 @@ class SQLFormatterSpec extends FlatSpec with Matchers {
 
   "keyWordsAligned function" should "return multiline SQL string with custom aligned indent" in {
     val inputSQL =
-      """
-        |SELECT *
-        |FROM SELECTION
-        |WHERE id = 1""".stripMargin
-    val expectedSQl ="""
-   |SELECT *
-   |  FROM SELECTION
-   | WHERE id = 1"""
-    val actualFormattedString = SQLFormatter.keyWordsAligned(inputSQL, leftIndent = Some("   |"))
+    """
+    |SELECT *
+    |FROM SELECTION
+    |WHERE id = 1""".stripMargin
+    val expectedSQl =
+    """
+    |SELECT *
+    |  FROM SELECTION
+    | WHERE id = 1""".stripMargin
+    val actualFormattedString = SQLFormatter.keyWordsAligned(inputSQL)
 
     actualFormattedString shouldBe expectedSQl
   }
@@ -97,7 +98,7 @@ class SQLFormatterSpec extends FlatSpec with Matchers {
         |       ON USERS.id = SYSTEM_USERS.id
         | WHERE 1=1
         |       AND id = 1
-        |       AND age > 0"""
+        |       AND age > 0""".stripMargin
     val actualFormattedString = SQLFormatter.keyWordsAligned(inputSQL)
 
     actualFormattedString shouldBe expectedSQl
@@ -115,7 +116,45 @@ class SQLFormatterSpec extends FlatSpec with Matchers {
         |       first_name,
         |       last_name
         |  FROM USERS""".stripMargin
-    val actualFormattedString = SQLFormatter.selectFieldsToNewLine(inputSQL)
+    val actualFormattedString = SQLFormatter.selectFieldsAlignedToNewLine(inputSQL)
+
+    actualFormattedString shouldBe expectedSQl
+  }
+
+  "applyCustomLeftIndent function" should "return multiline SQL string with custom aligned indent" in {
+    val inputSQL =
+      """
+        |SELECT *
+        |  FROM SELECTION
+        | WHERE id = 1""".stripMargin
+    val expectedSQl ="""
+   |SELECT *
+   |  FROM SELECTION
+   | WHERE id = 1"""
+    val actualFormattedString = SQLFormatter.applyCustomLeftIndent(inputSQL, leftIndent = Some("   |"))
+
+    actualFormattedString shouldBe expectedSQl
+  }
+
+  "cteAlignedByWithKeyword function" should "return well formatted SQL with right indent for CTE expressions" in {
+    val inputSQL =
+    """
+    |WITH base as (
+    |SELECT *
+    |  FROM people)
+    |
+    |SELECT id
+    |  FROM base""".stripMargin
+
+    val expectedSQl =
+      """
+        |WITH base as (
+        |     SELECT *
+        |       FROM people)
+        |
+        |SELECT id
+        |  FROM base""".stripMargin
+    val actualFormattedString = SQLFormatter.cteAlignedByWithKeyword(inputSQL)
 
     actualFormattedString shouldBe expectedSQl
   }

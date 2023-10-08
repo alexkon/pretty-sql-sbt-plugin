@@ -60,10 +60,13 @@ object SQLFormatterPlugin extends AutoPlugin {
     Some(sql)
       .map(minifySqlString)
       .map(keyWordsToUpper)
+      .map(cteNewLineSeparated)
       .map(keyWordsToNewLine)
       .map(emptyLineBeforeLastSelectIfNotOnlyOne)
-      .map(keyWordsAligned(_, customLeftIndent))
-      .map(selectFieldsToNewLine)
+      .map(keyWordsAligned)
+      .map(selectFieldsAlignedToNewLine)
+      .map(cteAlignedByWithKeyword)
+      .map(applyCustomLeftIndent(_,customLeftIndent))
       .getOrElse(throw new RuntimeException("Unexpected behaviour: function `formatSQLString` should return String!"))
   }
 }
