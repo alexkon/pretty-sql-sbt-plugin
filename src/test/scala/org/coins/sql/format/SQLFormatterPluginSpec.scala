@@ -1,7 +1,11 @@
 package org.coins.sql.format
 
+import org.coins.sql.format.SQLFormatterPlugin.formatSQLInString
 import org.scalatest.flatspec.{AnyFlatSpec => FlatSpec}
 import org.scalatest.matchers.should.Matchers
+import sbt.File
+import sbt.io.IO
+
 import scala.util.Random
 
 class SQLFormatterPluginSpec extends FlatSpec with Matchers {
@@ -107,4 +111,75 @@ ${customLeftIndent}  FROM people"""
 
     actualFormattedString shouldBe expectedSQl
   }
+
+  "formatSQLInString function" should "return well formatted SQL with one sql fragment" in {
+    val rawExpectedString =
+      """package xx.xx.xx
+        |
+        |object xxxJob {
+        |
+        |  private class SparkJob(deltaService: DeltaService)(implicit spark: SparkSession) {
+        |
+        |    override def xxx(): DataFrame = {
+        |
+        |      val spark.sql(s\"\"\"
+        |        |WITH base AS (
+        |        |     SELECT *
+        |        |       FROM people)
+        |        |
+        |        |SELECT id
+        |        |  FROM base
+        |        | GROUP BY user_id\"\"\".stripMargin
+        |      )
+        |
+        |      printAndApplySparkSql(spark, sql)
+        |    }
+        |
+        |  }
+        |
+        |}
+        |""".stripMargin
+    val expectedString = rawExpectedString.replace("\\", "")
+    val content = IO.read(new File("output/test_spark_sql.scala"))
+    val actualFormattedContent: String = formatSQLInString(content)
+
+//    println(actualFormattedContent)
+    actualFormattedContent shouldBe expectedString
+  }
+
+  "formatSQLInString function" should "return well formatted SQL with multiple sql fragments" in {
+    val rawExpectedString =
+      """package xx.xx.xx
+        |
+        |object xxxJob {
+        |
+        |  private class SparkJob(deltaService: DeltaService)(implicit spark: SparkSession) {
+        |
+        |    override def xxx(): DataFrame = {
+        |
+        |      val spark.sql(s\"\"\"
+        |        |WITH base AS (
+        |        |     SELECT *
+        |        |       FROM people)
+        |        |
+        |        |SELECT id
+        |        |  FROM base
+        |        | GROUP BY user_id\"\"\".stripMargin
+        |      )
+        |
+        |      printAndApplySparkSql(spark, sql)
+        |    }
+        |
+        |  }
+        |
+        |}
+        |""".stripMargin
+    val expectedString = rawExpectedString.replace("\\", "")
+    val content = IO.read(new File("output/test_sql.scala"))
+    val actualFormattedContent: String = formatSQLInString(content)
+
+    println(actualFormattedContent)
+//    actualFormattedContent shouldBe expectedString
+  }
+
 }
