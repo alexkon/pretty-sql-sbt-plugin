@@ -186,8 +186,77 @@ ${customLeftIndent}  FROM people"""
     actualFormattedContent shouldBe expectedString
   }
 
+  "formatSQLInString function" should "return well formatted SQL which parsed from multiple sqls stated by different ways" in {
+    val rawExpectedString =
+      """package xx.xx.xx
+        |
+        |object yyyJob {
+        |
+        |  private class SparkJob(deltaService: DeltaService)(implicit spark: SparkSession) {
+        |
+        |    override def xxx(): DataFrame = {
+        |
+        |      val a =
+        |        s\"\"\"
+        |           |   aaa
+        |           |   vv
+        |           |\"\"\"
+        |
+        |      val sql =
+        |        s\"\"\"
+        |        |WITH base AS (
+        |        |     SELECT *
+        |        |       FROM people)
+        |        |
+        |        |SELECT id
+        |        |  FROM base
+        |        | GROUP BY user_id\"\"\".stripMargin
+        |
+        |      val sql2 =
+        |         \"\"\"
+        |        |WITH base2 AS (
+        |        |     SELECT *
+        |        |       FROM people)
+        |        |
+        |        |SELECT id
+        |        |  FROM base
+        |        | GROUP BY user_id\"\"\".stripMargin
+        |
+        |      spark.sql(
+        |        \"\"\"
+        |        |WITH base2 AS (
+        |        |     SELECT *
+        |        |       FROM people)
+        |        |
+        |        |SELECT id
+        |        |  FROM base
+        |        | GROUP BY user_id\"\"\".stripMargin)
+        |
+        |      spark.sql(\"\"\"
+        |        |WITH base2 AS (
+        |        |     SELECT *
+        |        |       FROM people)
+        |        |
+        |        |SELECT id
+        |        |  FROM base
+        |        | GROUP BY user_id\"\"\".stripMargin
+        |      )
+        |
+        |      printAndApplySparkSql(spark, sql)
+        |    }
+        |
+        |  }
+        |
+        |}""".stripMargin
+    val expectedString = rawExpectedString.replace("\\", "")
+    val content = IO.read(new File("output/multi_sql_statement_contained_demo.scala"))
+    val actualFormattedContent: String = formatSQLInString(content)
+
+    actualFormattedContent shouldBe expectedString
+  }
+
   "formatSQLInString debug" should "print in console" in {
-    val content = IO.read(new File("output/single_sql_statement_contained_demo1.scala"))
+    val content = IO.read(new File("output/demo-scala-file.scala"))
     val actualFormattedContent: String = formatSQLInString(content)
     println(actualFormattedContent)
   }
