@@ -6,7 +6,8 @@ import sbt._
 object SQLFormatterPlugin extends AutoPlugin {
 
   object autoImport {
-    val formatSQL = inputKey[Unit]("Format SQL embedded in Scala strings, optionally in a specified file.")
+    val formatSQL =
+      inputKey[Unit]("Format SQL embedded in Scala strings, optionally in a specified file.")
   }
 
   import autoImport._
@@ -44,12 +45,21 @@ object SQLFormatterPlugin extends AutoPlugin {
   }
 
   def formatSQLInString(content: String): String = {
-    val sqlPattern = """spark\.sql\(\n?\s*s?\"\"\"(?s)(.*?)\"\"\"\.stripMargin\)""".r
-    sqlPattern.replaceAllIn(content, m => {
-      val sql = m.group(1)
-      val formattedSQL = formatSQLString(sql)
-      s"""spark.sql(s\"\"\"$formattedSQL\"\"\".stripMargin)"""
-    })
+    val sqlPattern = """\"\"\"(?si).*?((with|select).*?)\"\"\"""".r
+    val sections: Array[String] = content.split(".stripMargin")
+    val strBuilder: StringBuilder = new StringBuilder
+    for (section <- sections) {
+      val newSection: String = sqlPattern.replaceAllIn(
+        section,
+        m => {
+          val sql = m.group(1)
+          val formattedSQL = formatSQLString(sql)
+          s"""\"\"\"$formattedSQL\"\"\".stripMargin"""
+        }
+      )
+      strBuilder.append(newSection)
+    }
+    strBuilder.toString()
   }
 
   def formatSQLString(sql: String): String = {
@@ -66,7 +76,11 @@ object SQLFormatterPlugin extends AutoPlugin {
       .map(keyWordsAligned)
       .map(selectFieldsAlignedToNewLine)
       .map(cteAlignedByWithKeyword)
-      .map(applyCustomLeftIndent(_,customLeftIndent))
-      .getOrElse(throw new RuntimeException("Unexpected behaviour: function `formatSQLString` should return String!"))
+      .map(applyCustomLeftIndent(_, customLeftIndent))
+      .getOrElse(
+        throw new RuntimeException(
+          "Unexpected behaviour: function `formatSQLString` should return String!"
+        )
+      )
   }
 }

@@ -1,7 +1,11 @@
 package org.coins.sql.format
 
+import org.coins.sql.format.SQLFormatterPlugin.formatSQLInString
 import org.scalatest.flatspec.{AnyFlatSpec => FlatSpec}
 import org.scalatest.matchers.should.Matchers
+import sbt.File
+import sbt.io.IO
+
 import scala.util.Random
 
 class SQLFormatterPluginSpec extends FlatSpec with Matchers {
@@ -106,5 +110,85 @@ ${customLeftIndent}  FROM people"""
     val actualFormattedString = SQLFormatterPlugin.formatSQLString(inputSQL)
 
     actualFormattedString shouldBe expectedSQl
+  }
+
+  "formatSQLInString function" should "return well formatted SQL with irregular sql string fragment" in {
+    val rawExpectedString =
+      """package xx.xx.xx
+        |
+        |object xxxJob {
+        |
+        |  private class SparkJob(deltaService: DeltaService)(implicit spark: SparkSession) {
+        |
+        |    override def xxx(): DataFrame = {
+        |
+        |      val spark.sql(s\"\"\"
+        |        |WITH base AS (
+        |        |     SELECT *
+        |        |       FROM people)
+        |        |
+        |        |SELECT id
+        |        |  FROM base
+        |        | GROUP BY user_id\"\"\".stripMargin
+        |      )
+        |
+        |      printAndApplySparkSql(spark, sql)
+        |    }
+        |
+        |  }
+        |
+        |}
+        |""".stripMargin
+    val expectedString = rawExpectedString.replace("\\", "")
+    val content = IO.read(new File("output/single_sql_statement_contained_demo2.scala"))
+    val actualFormattedContent: String = formatSQLInString(content)
+
+    actualFormattedContent shouldBe expectedString
+  }
+
+  "formatSQLInString function" should "return well formatted SQL which parsed from sql stated like sql = " in {
+    val rawExpectedString =
+      """package xx.xx.xx
+        |
+        |object xxxJob {
+        |
+        |  private class SparkJob(deltaService: DeltaService)(implicit spark: SparkSession) {
+        |
+        |    override def xxx(): DataFrame = {
+        |
+        |      val sql =
+        |        s\"\"\"
+        |        |WITH usd_php_rate_with_rn AS (
+        |        |     SELECT *,
+        |        |            row_number() OVER (PARTITION BY base, quote
+        |        |      ORDER BY update_at DESC) AS rn
+        |        |       FROM #ratesTable
+        |        |      WHERE `date` = '#{config.date}' )
+        |        |
+        |        |SELECT base,
+        |        |       quote,
+        |        |       rate,
+        |        |       update_at
+        |        |  FROM usd_php_rate_with_rn
+        |        | WHERE rn = 1\"\"\".stripMargin
+        |
+        |      printAndApplySparkSql(spark, sql)
+        |    }
+        |
+        |  }
+        |
+        |}
+        |""".stripMargin
+    val expectedString = rawExpectedString.replace("\\", "")
+    val content = IO.read(new File("output/single_sql_statement_contained_demo1.scala"))
+    val actualFormattedContent: String = formatSQLInString(content)
+
+    actualFormattedContent shouldBe expectedString
+  }
+
+  "formatSQLInString debug" should "print in console" in {
+    val content = IO.read(new File("output/single_sql_statement_contained_demo1.scala"))
+    val actualFormattedContent: String = formatSQLInString(content)
+    println(actualFormattedContent)
   }
 }
