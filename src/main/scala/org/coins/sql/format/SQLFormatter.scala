@@ -17,7 +17,9 @@ object SQLFormatter {
   private val DEFAULT_LEFT_INDENT = " " * 8 + "|"  // 8-space indentation with |
 
   def findCustomLeftIndent(sql: String): Option[String] = {
-    "^(\\s+\\|)".r.findFirstMatchIn(sql).map(m => m.matched.replace("\n", ""))
+    val leftIndentIter: Iterator[String] =
+      "(?m)^(\\s+\\|)".r.findAllMatchIn(sql).map(m => m.matched.replace("\n", ""))
+    Option(leftIndentIter.toList.head)
   }
 
   def findPrefixForSelect(sql: String): Option[String] = {

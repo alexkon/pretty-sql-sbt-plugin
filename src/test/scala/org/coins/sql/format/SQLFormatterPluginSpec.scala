@@ -186,7 +186,7 @@ ${customLeftIndent}  FROM people"""
     actualFormattedContent shouldBe expectedString
   }
 
-  "formatSQLInString function" should "return well formatted SQL which parsed from multiple sqls stated by different ways" in {
+  "formatSQLInString function" should "return well and pretty formatted SQL which parsed from multiple sqls stated by different ways" in {
     val rawExpectedString =
       """package xx.xx.xx
         |
@@ -204,42 +204,42 @@ ${customLeftIndent}  FROM people"""
         |
         |      val sql =
         |        s\"\"\"
-        |        |WITH base AS (
-        |        |     SELECT *
-        |        |       FROM people)
-        |        |
-        |        |SELECT id
-        |        |  FROM base
-        |        | GROUP BY user_id\"\"\".stripMargin
+        |           |WITH base AS (
+        |           |     SELECT *
+        |           |       FROM people)
+        |           |
+        |           |SELECT id
+        |           |  FROM base
+        |           | GROUP BY user_id\"\"\".stripMargin
         |
         |      val sql2 =
         |         \"\"\"
-        |        |WITH base2 AS (
-        |        |     SELECT *
-        |        |       FROM people)
-        |        |
-        |        |SELECT id
-        |        |  FROM base
-        |        | GROUP BY user_id\"\"\".stripMargin
+        |           |WITH base2 AS (
+        |           |     SELECT *
+        |           |       FROM people)
+        |           |
+        |           |SELECT id
+        |           |  FROM base
+        |           | GROUP BY user_id\"\"\".stripMargin
         |
         |      spark.sql(
         |        \"\"\"
-        |        |WITH base2 AS (
-        |        |     SELECT *
-        |        |       FROM people)
-        |        |
-        |        |SELECT id
-        |        |  FROM base
-        |        | GROUP BY user_id\"\"\".stripMargin)
+        |          |WITH base2 AS (
+        |          |     SELECT *
+        |          |       FROM people)
+        |          |
+        |          |SELECT id
+        |          |  FROM base
+        |          | GROUP BY user_id\"\"\".stripMargin)
         |
         |      spark.sql(\"\"\"
-        |        |WITH base2 AS (
-        |        |     SELECT *
-        |        |       FROM people)
-        |        |
-        |        |SELECT id
-        |        |  FROM base
-        |        | GROUP BY user_id\"\"\".stripMargin
+        |                  |WITH base2 AS (
+        |                  |     SELECT *
+        |                  |       FROM people)
+        |                  |
+        |                  |SELECT id
+        |                  |  FROM base
+        |                  | GROUP BY user_id\"\"\".stripMargin
         |      )
         |
         |      printAndApplySparkSql(spark, sql)
@@ -256,7 +256,7 @@ ${customLeftIndent}  FROM people"""
   }
 
   "formatSQLInString debug" should "print in console" in {
-    val content = IO.read(new File("output/demo-scala-file.scala"))
+    val content = IO.read(new File("output/multi_sql_statement_contained_demo.scala"))
     val actualFormattedContent: String = formatSQLInString(content)
     println(actualFormattedContent)
   }
