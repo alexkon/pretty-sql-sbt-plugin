@@ -123,13 +123,13 @@ ${customLeftIndent}  FROM people"""
         |    override def xxx(): DataFrame = {
         |
         |      val spark.sql(s\"\"\"
-        |        |WITH base AS (
-        |        |     SELECT *
-        |        |       FROM people)
-        |        |
-        |        |SELECT id
-        |        |  FROM base
-        |        | GROUP BY user_id\"\"\".stripMargin
+        |           |WITH base AS (
+        |           |     SELECT *
+        |           |       FROM people)
+        |           |
+        |           |SELECT id
+        |           |  FROM base
+        |           | GROUP BY user_id\"\"\".stripMargin
         |      )
         |
         |      printAndApplySparkSql(spark, sql)
@@ -158,19 +158,19 @@ ${customLeftIndent}  FROM people"""
         |
         |      val sql =
         |        s\"\"\"
-        |        |WITH usd_php_rate_with_rn AS (
-        |        |     SELECT *,
-        |        |            row_number() OVER (PARTITION BY base, quote
-        |        |      ORDER BY update_at DESC) AS rn
-        |        |       FROM #ratesTable
-        |        |      WHERE `date` = '#{config.date}' )
-        |        |
-        |        |SELECT base,
-        |        |       quote,
-        |        |       rate,
-        |        |       update_at
-        |        |  FROM usd_php_rate_with_rn
-        |        | WHERE rn = 1\"\"\".stripMargin
+        |         |WITH usd_php_rate_with_rn AS (
+        |         |     SELECT *,
+        |         |            row_number() OVER (PARTITION BY base, quote
+        |         |      ORDER BY update_at DESC) AS rn
+        |         |       FROM #ratesTable
+        |         |      WHERE `date` = '#{config.date}' )
+        |         |
+        |         |SELECT base,
+        |         |       quote,
+        |         |       rate,
+        |         |       update_at
+        |         |  FROM usd_php_rate_with_rn
+        |         | WHERE rn = 1\"\"\".stripMargin
         |
         |      printAndApplySparkSql(spark, sql)
         |    }
@@ -256,7 +256,7 @@ ${customLeftIndent}  FROM people"""
   }
 
   "formatSQLInString debug" should "print in console" in {
-    val content = IO.read(new File("output/multi_sql_statement_contained_demo.scala"))
+    val content = IO.read(new File("output/single_sql_statement_contained_demo2.scala"))
     val actualFormattedContent: String = formatSQLInString(content)
     println(actualFormattedContent)
   }
