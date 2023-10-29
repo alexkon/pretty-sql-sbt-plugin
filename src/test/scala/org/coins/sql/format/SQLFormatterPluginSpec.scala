@@ -1,6 +1,7 @@
 package org.coins.sql.format
 
 import org.scalatest.flatspec.{AnyFlatSpec => FlatSpec}
+import org.coins.sql.format.SQLFormatterPlugin.formatSQLInString
 import org.scalatest.matchers.should.Matchers
 import scala.util.Random
 
@@ -106,5 +107,50 @@ ${customLeftIndent}  FROM people"""
     val actualFormattedString = SQLFormatterPlugin.formatSQLString(inputSQL)
 
     actualFormattedString shouldBe expectedSQl
+  }
+
+  /**
+   * `formatSQLInString` needs to implement the following features at the same time：
+   * 1. none sql string should not be affected.
+   * 2. Support both three double quotes or a single double quote wrapped sql statement.
+   * 3. Support comments
+   */
+  "formatSQLInString debug" should "print in console" in {
+    val threeDoubleQuotes = "\"\"\""
+    val content =
+      s"""package xx.xx.xx
+        |object xxxJob {
+        |  private class SparkJob(deltaService: DeltaService)(implicit spark: SparkSession) {
+        |    val str = "string should not be impacted"
+        |    val sql1 = "  select * from user"
+        |    spark.sql("select * from user")
+        |    spark.sql($threeDoubleQuotes select * from user$threeDoubleQuotes)
+        |    val sql2 = $threeDoubleQuotes
+        |                 |-- this is comment
+        |                 |select * from people$threeDoubleQuotes
+        |  }
+        |}""".stripMargin
+    val actualFormattedContent: String = formatSQLInString(content)
+
+    val expectedString = s"""package xx.xx.xx
+                            |object xxxJob {
+                            |  private class SparkJob(deltaService: DeltaService)(implicit spark: SparkSession) {
+                            |    val str = "string should not be impacted"
+                            |    val sql1 = $threeDoubleQuotes
+                            |        |SELECT *
+                            |        |  FROM user$threeDoubleQuotes.stripMargin
+                            |    spark.sql($threeDoubleQuotes
+                            |        |SELECT *
+                            |        |  FROM user$threeDoubleQuotes.stripMargin)
+                            |    spark.sql($threeDoubleQuotes
+                            |        |SELECT *
+                            |        |  FROM user$threeDoubleQuotes.stripMargin)
+                            |    val sql2 = $threeDoubleQuotes-- this is comment
+                            |                 |SELECT *
+                            |                 |  FROM people$threeDoubleQuotes.stripMargin
+                            |  }
+                            |}""".stripMargin
+
+    actualFormattedContent shouldBe expectedString
   }
 }
