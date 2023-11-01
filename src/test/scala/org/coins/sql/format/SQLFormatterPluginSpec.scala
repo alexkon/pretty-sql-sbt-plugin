@@ -115,7 +115,7 @@ ${customLeftIndent}  FROM people"""
    * 2. Support both three double quotes or a single double quote wrapped sql statement.
    * 3. Support comments
    */
-  "formatSQLInString debug" should "print in console" in {
+  "formatSQLInString" should "support situations as comments mentioned" in {
     val threeDoubleQuotes = "\"\"\""
     val content =
       s"""package xx.xx.xx
