@@ -45,15 +45,22 @@ object SQLFormatterPlugin extends AutoPlugin {
   }
 
   def formatSQLInString(content: String): String = {
-    val sqlPattern = """spark\.sql\(\n?\s*s?\"\"\"(?s)(.*?)\"\"\"\.stripMargin\)""".r
-    sqlPattern.replaceAllIn(
-      content,
-      m => {
-        val sql = m.group(1)
-        val formattedSQL = formatSQLString(sql)
-        s"""spark.sql(s\"\"\"$formattedSQL\"\"\".stripMargin)"""
-      }
-    )
+    val sqlPattern = """\"{1,3}(?si)(.*?select.*?)\"{1,3}""".r
+    val sections: Array[String] = content.split("=")
+    println(sections.toList)
+    val strBuilder: StringBuilder = new StringBuilder
+    for (section <- sections) {
+      val newSection: String = sqlPattern.replaceAllIn(
+        section,
+        m => {
+          val sql = m.group(1)
+          val formattedSQL = formatSQLString(sql)
+          s"""\"\"\"$formattedSQL\"\"\".stripMargin"""
+        }
+      )
+      strBuilder.append(newSection + "=")
+    }
+    strBuilder.toString().dropRight(1)
   }
 
   def formatSQLString(sql: String): String = {
