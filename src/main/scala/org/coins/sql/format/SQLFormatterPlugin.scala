@@ -3,7 +3,10 @@ package org.coins.sql.format
 import sbt.Keys._
 import sbt._
 
-object SQLFormatterPlugin extends AutoPlugin {
+import java.time.Instant
+import java.util.UUID
+
+object SQLFormatterPlugin extends AutoPlugin with SQLFormatterPluginTrait {
 
   object autoImport {
     val formatSQL =
@@ -44,14 +47,14 @@ object SQLFormatterPlugin extends AutoPlugin {
     log.info(s"Formatted SQL in $file")
   }
 
-  def formatSQLInString(content: String): String = {
-    val sqlPattern = """spark\.sql\(\n?\s*s?\"\"\"(?s)(.*?)\"\"\"\.stripMargin\)""".r
+  override def formatSQLInString(content: String): String = {
+    val sqlPattern = """\"{1,3}(?si)([^"]*?select[^"]*?)\"{1,3}""".r
     sqlPattern.replaceAllIn(
       content,
       m => {
         val sql = m.group(1)
         val formattedSQL = formatSQLString(sql)
-        s"""spark.sql(s\"\"\"$formattedSQL\"\"\".stripMargin)"""
+        s"""\"\"\"$formattedSQL\"\"\".stripMargin"""
       }
     )
   }
