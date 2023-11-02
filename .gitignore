@@ -8,4 +8,3 @@ project/target/*
 project/*/target/*
 node_modules/
 package.json
-
