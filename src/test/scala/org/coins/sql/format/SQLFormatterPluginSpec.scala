@@ -1,7 +1,7 @@
 package org.coins.sql.format
 
 import org.scalatest.flatspec.{AnyFlatSpec => FlatSpec}
-import org.coins.sql.format.SQLFormatterPlugin.formatSQLInString
+import org.coins.sql.format.SQLFormatterPluginDeco.formatSQLInString
 import org.scalatest.matchers.should.Matchers
 import scala.util.Random
 
@@ -111,7 +111,8 @@ ${customLeftIndent}  FROM people"""
 
   /** `formatSQLInString` needs to implement the following features at the same time：
     *   1. none sql string should not be affected.
-    *   2. Support both three double quotes or a single double quote wrapped sql statement.
+    *   2. Support both three double quotes or a single
+    *      double quote wrapped sql statement.
     */
   "formatSQLInString" should "support situations as comments mentioned" in {
     val threeDoubleQuotes = "\"\"\""
@@ -148,6 +149,32 @@ ${customLeftIndent}  FROM people"""
                             |                 |  FROM people$threeDoubleQuotes.stripMargin
                             |  }
                             |}""".stripMargin
+
+    actualFormattedContent shouldBe expectedString
+  }
+
+  "formatSQLInString" should "support to return well formatted SQL when refer to variables in sql with `$` " in {
+    val threeDoubleQuotes = "\"\"\""
+    val dollarSign = "$"
+    val content =
+      s"""package xx.xx.xx
+         |object xxxJob {
+         |  private class SparkJob(deltaService: DeltaService)(implicit spark: SparkSession) {
+         |    val date = "2023-11-11"
+         |    val sql = ${threeDoubleQuotes}select '$dollarSign{date}' AS date from people${threeDoubleQuotes}
+         |  }
+         |}""".stripMargin
+
+    val actualFormattedContent: String = formatSQLInString(content)
+    val expectedString = s"""package xx.xx.xx
+                           |object xxxJob {
+                           |  private class SparkJob(deltaService: DeltaService)(implicit spark: SparkSession) {
+                           |    val date = "2023-11-11"
+                           |    val sql = $threeDoubleQuotes
+                           |        |SELECT '$dollarSign{date}' AS date
+                           |        |  FROM people$threeDoubleQuotes.stripMargin
+                           |  }
+                           |}""".stripMargin
 
     actualFormattedContent shouldBe expectedString
   }
