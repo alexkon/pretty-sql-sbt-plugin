@@ -6,7 +6,12 @@ import scala.util.matching.Regex
 object RegexHelper {
   val KEY_INSENSITIVE_KEY = "(?i)"
 
-  def replaceWord(wordOld: String, wordNew: String, target: String, isCaseInsensitive: Boolean = false): String = {
+  def replaceWord(
+      wordOld: String,
+      wordNew: String,
+      target: String,
+      isCaseInsensitive: Boolean = false
+  ): String = {
     val pattern = if (isCaseInsensitive) {
       s"$KEY_INSENSITIVE_KEY\\b$wordOld\\b".r
     } else {
@@ -27,7 +32,7 @@ object RegexHelper {
     val pattern = s"\\b$word\\b".r
     val matches = pattern.findAllMatchIn(sql).toList
 
-    if (matches.nonEmpty && matches.length > 1) {   // if match found and it's not the only one
+    if (matches.nonEmpty && matches.length > 1) { // if match found and it's not the only one
       val lastMatch = matches.last
       val (start, end) = (lastMatch.start, lastMatch.end)
       val (before, after) = (sql.substring(0, start), sql.substring(end))
@@ -49,12 +54,12 @@ object RegexHelper {
     @tailrec
     def loop(lines: Seq[String], lineIndex: Int, pattern: Regex): Option[Int] = {
       if (lineIndex >= lines.size) {
-        return None
+        None
       } else {
         val currentLine = lines(lineIndex)
         pattern.findFirstMatchIn(currentLine) match {
-          case Some(_) => return Some(lineIndex)
-          case None => loop(lines, lineIndex + 1, pattern)
+          case Some(_) => Some(lineIndex)
+          case None    => loop(lines, lineIndex + 1, pattern)
         }
       }
     }
@@ -70,7 +75,7 @@ object RegexHelper {
     val firstMatch = lineNumberWithFirstWordMatch(word, sqlReversedLines)
     firstMatch match {
       case Some(index) => Some(lines.size - 1 - index)
-      case None => firstMatch
+      case None        => firstMatch
     }
   }
 }

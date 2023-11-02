@@ -66,12 +66,12 @@ class SQLFormatterSpec extends FlatSpec with Matchers {
 
   "keyWordsAligned function" should "return multiline SQL string with custom aligned indent" in {
     val inputSQL =
-    """
+      """
     |SELECT *
     |FROM SELECTION
     |WHERE id = 1""".stripMargin
     val expectedSQl =
-    """
+      """
     |SELECT *
     |  FROM SELECTION
     | WHERE id = 1""".stripMargin
@@ -127,18 +127,19 @@ class SQLFormatterSpec extends FlatSpec with Matchers {
         |SELECT *
         |  FROM SELECTION
         | WHERE id = 1""".stripMargin
-    val expectedSQl ="""
+    val expectedSQl = """
    |SELECT *
    |  FROM SELECTION
    | WHERE id = 1"""
-    val actualFormattedString = SQLFormatter.applyCustomLeftIndent(inputSQL, leftIndent = Some("   |"))
+    val actualFormattedString =
+      SQLFormatter.applyCustomLeftIndent(inputSQL, leftIndent = Some("   |"))
 
     actualFormattedString shouldBe expectedSQl
   }
 
   "cteAlignedByWithKeyword function" should "return well formatted SQL with right indent for CTE expressions" in {
     val inputSQL =
-    """
+      """
     |WITH base as (
     |SELECT *
     |  FROM people)
