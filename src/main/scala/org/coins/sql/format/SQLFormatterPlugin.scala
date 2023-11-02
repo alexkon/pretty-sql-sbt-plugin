@@ -45,13 +45,13 @@ object SQLFormatterPlugin extends AutoPlugin {
   }
 
   def formatSQLInString(content: String): String = {
-    val sqlPattern = """spark\.sql\(\n?\s*s?\"\"\"(?s)(.*?)\"\"\"\.stripMargin\)""".r
+    val sqlPattern = """\"{1,3}(?si)([^"]*?select[^"]*?)\"{1,3}""".r
     sqlPattern.replaceAllIn(
       content,
       m => {
         val sql = m.group(1)
         val formattedSQL = formatSQLString(sql)
-        s"""spark.sql(s\"\"\"$formattedSQL\"\"\".stripMargin)"""
+        s"""\"\"\"$formattedSQL\"\"\".stripMargin"""
       }
     )
   }
