@@ -153,7 +153,7 @@ ${customLeftIndent}  FROM people"""
     actualFormattedContent shouldBe expectedString
   }
 
-  "formatSQLInString" should "support to return well formatted SQL when refer to variables in sql with `$` " in {
+  "formatSQLInString" should "support to return well formatted SQL when refer to variables in sql with `$`" in {
     val threeDoubleQuotes = "\"\"\""
     val dollarSign = "$"
     val content =
