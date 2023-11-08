@@ -110,8 +110,8 @@ ${customLeftIndent}  FROM people"""
   }
 
   /** `formatSQLInString` needs to implement the following features at the same time：
-    *   1. none sql string should not be affected. 2. Support both three double quotes or a single
-    *      double quote wrapped sql statement.
+    *   1. none SQL string should not be affected.
+   *    2. SQL wrapped in single double quotes will not be formatted
     */
   "formatSQLInString" should "support situations as comments mentioned" in {
     val threeDoubleQuotes = "\"\"\""
