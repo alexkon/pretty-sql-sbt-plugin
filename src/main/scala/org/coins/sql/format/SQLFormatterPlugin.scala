@@ -45,7 +45,7 @@ object SQLFormatterPlugin extends AutoPlugin {
   }
 
   def formatSQLInString(content: String): String = {
-    val sqlPattern = """\"{1,3}(?si)([^"]*?select[^"]*?)\"{1,3}""".r
+    val sqlPattern = """\"{3}(?si)([^"]*?select[^"]*?)\"{3}""".r
     sqlPattern.replaceAllIn(
       content,
       m => {
