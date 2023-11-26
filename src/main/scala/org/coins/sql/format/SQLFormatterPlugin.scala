@@ -2,6 +2,7 @@ package org.coins.sql.format
 
 import sbt.Keys._
 import sbt._
+import java.util.UUID
 
 object SQLFormatterPlugin extends AutoPlugin {
 
@@ -13,6 +14,8 @@ object SQLFormatterPlugin extends AutoPlugin {
   import autoImport._
 
   override def trigger: PluginTrigger = allRequirements
+
+  private val replacementMapping = Map("$" -> UUID.randomUUID)
 
   override def projectSettings: Seq[Setting[_]] = Seq(
     formatSQL := {
@@ -45,15 +48,18 @@ object SQLFormatterPlugin extends AutoPlugin {
   }
 
   def formatSQLInString(content: String): String = {
+    val replacedContent: String = content.replace("$", replacementMapping("$").toString)
     val sqlPattern = """\"{3}(?si)([^"]*?select[^"]*?)\"{3}""".r
-    sqlPattern.replaceAllIn(
-      content,
-      m => {
-        val sql = m.group(1)
-        val formattedSQL = formatSQLString(sql)
-        s"""\"\"\"$formattedSQL\"\"\".stripMargin"""
-      }
-    )
+    sqlPattern
+      .replaceAllIn(
+        replacedContent,
+        m => {
+          val sql = m.group(1)
+          val formattedSQL = formatSQLString(sql)
+          s"""\"\"\"$formattedSQL\"\"\".stripMargin"""
+        }
+      )
+      .replace(replacementMapping("$").toString, "$")
   }
 
   def formatSQLString(sql: String): String = {

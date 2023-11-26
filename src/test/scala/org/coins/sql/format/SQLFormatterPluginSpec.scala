@@ -110,22 +110,24 @@ ${customLeftIndent}  FROM people"""
   }
 
   /** `formatSQLInString` needs to implement the following features at the same time：
-    *   1. none SQL string should not be affected.
-   *    2. SQL wrapped in single double quotes will not be formatted
+    *   1. none SQL string should not be affected. 2. SQL wrapped in single double quotes will not
+    *      be formatted
     */
   "formatSQLInString" should "support situations as comments mentioned" in {
     val threeDoubleQuotes = "\"\"\""
+    val dollar_sign = "$"
     val content =
       s"""package xx.xx.xx
          |object xxxJob {
          |  private class SparkJob(deltaService: DeltaService)(implicit spark: SparkSession) {
+         |    val date = '2023-11-11'
          |    val str = "string should not be impacted"
          |    val sql1 = "  select * from user"
          |    spark.sql("select * from user")
          |    spark.sql($threeDoubleQuotes select * from user$threeDoubleQuotes)
-         |    val sql2 = $threeDoubleQuotes
+         |    val sql2 = s$threeDoubleQuotes
          |                 |-- this is a comment
-         |                 |select * from people$threeDoubleQuotes
+         |                 |select *, ${dollar_sign}date dt from people$threeDoubleQuotes
          |  }
          |}""".stripMargin
     val actualFormattedContent: String = formatSQLInString(content)
@@ -133,14 +135,16 @@ ${customLeftIndent}  FROM people"""
     val expectedString = s"""package xx.xx.xx
                             |object xxxJob {
                             |  private class SparkJob(deltaService: DeltaService)(implicit spark: SparkSession) {
+                            |    val date = '2023-11-11'
                             |    val str = "string should not be impacted"
                             |    val sql1 = "  select * from user"
                             |    spark.sql("select * from user")
                             |    spark.sql($threeDoubleQuotes
                             |        |SELECT *
                             |        |  FROM user$threeDoubleQuotes.stripMargin)
-                            |    val sql2 = $threeDoubleQuotes-- this is a comment
-                            |                 |SELECT *
+                            |    val sql2 = s$threeDoubleQuotes-- this is a comment
+                            |                 |SELECT *,
+                            |                 |       $$date dt
                             |                 |  FROM people$threeDoubleQuotes.stripMargin
                             |  }
                             |}""".stripMargin
