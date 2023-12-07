@@ -111,21 +111,23 @@ ${customLeftIndent}  FROM people"""
 
   /** `formatSQLInString` needs to implement the following features at the same time：
     *   1. none SQL string should not be affected.
-   *    2. SQL wrapped in single double quotes will not be formatted
+    *   2. SQL wrapped in single double quotes will not be formatted
     */
   "formatSQLInString" should "support situations as comments mentioned" in {
-    val threeDoubleQuotes = "\"\"\""
+    val tripleQuote = "\"\"\""
+    val dollarSign = "$"
     val content =
       s"""package xx.xx.xx
          |object xxxJob {
          |  private class SparkJob(deltaService: DeltaService)(implicit spark: SparkSession) {
+         |    val date = '2023-11-11'
          |    val str = "string should not be impacted"
          |    val sql1 = "  select * from user"
          |    spark.sql("select * from user")
-         |    spark.sql($threeDoubleQuotes select * from user$threeDoubleQuotes)
-         |    val sql2 = $threeDoubleQuotes
+         |    spark.sql($tripleQuote select * from user$tripleQuote)
+         |    val sql2 = s$tripleQuote
          |                 |-- this is a comment
-         |                 |select * from people$threeDoubleQuotes
+         |                 |select *, ${dollarSign}date dt from people$tripleQuote
          |  }
          |}""".stripMargin
     val actualFormattedContent: String = formatSQLInString(content)
@@ -133,15 +135,17 @@ ${customLeftIndent}  FROM people"""
     val expectedString = s"""package xx.xx.xx
                             |object xxxJob {
                             |  private class SparkJob(deltaService: DeltaService)(implicit spark: SparkSession) {
+                            |    val date = '2023-11-11'
                             |    val str = "string should not be impacted"
                             |    val sql1 = "  select * from user"
                             |    spark.sql("select * from user")
-                            |    spark.sql($threeDoubleQuotes
+                            |    spark.sql($tripleQuote
                             |        |SELECT *
-                            |        |  FROM user$threeDoubleQuotes.stripMargin)
-                            |    val sql2 = $threeDoubleQuotes-- this is a comment
-                            |                 |SELECT *
-                            |                 |  FROM people$threeDoubleQuotes.stripMargin
+                            |        |  FROM user$tripleQuote.stripMargin)
+                            |    val sql2 = s$tripleQuote-- this is a comment
+                            |                 |SELECT *,
+                            |                 |       ${dollarSign}date dt
+                            |                 |  FROM people$tripleQuote.stripMargin
                             |  }
                             |}""".stripMargin
 

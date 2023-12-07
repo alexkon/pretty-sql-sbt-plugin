@@ -45,15 +45,16 @@ object SQLFormatterPlugin extends AutoPlugin {
   }
 
   def formatSQLInString(content: String): String = {
-    val sqlPattern = """\"{3}(?si)([^"]*?select[^"]*?)\"{3}""".r
-    sqlPattern.replaceAllIn(
-      content,
-      m => {
-        val sql = m.group(1)
-        val formattedSQL = formatSQLString(sql)
-        s"""\"\"\"$formattedSQL\"\"\".stripMargin"""
-      }
-    )
+    val sqlPattern = """"{3}(?si)([^"]*?select[^"]*?)"{3}""".r
+    sqlPattern
+      .replaceAllIn(
+        content,
+        m => {
+          val sql = m.group(1)
+          val formattedSQL = formatSQLString(sql)
+          s"""\"\"\"$formattedSQL\"\"\".stripMargin"""
+        }
+      )
   }
 
   def formatSQLString(sql: String): String = {
@@ -71,6 +72,7 @@ object SQLFormatterPlugin extends AutoPlugin {
       .map(selectFieldsAlignedToNewLine)
       .map(cteAlignedByWithKeyword)
       .map(applyCustomLeftIndent(_, customLeftIndent))
+      .map(escapeDollarSign)
       .getOrElse(
         throw new RuntimeException(
           "Unexpected behaviour: function `formatSQLString` should return String!"

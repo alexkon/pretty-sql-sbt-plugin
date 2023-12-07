@@ -39,6 +39,10 @@ object SQLFormatter {
     sql.stripMargin.split("\n").map(_.trim).mkString(" ").trim
   }
 
+  def escapeDollarSign(sql: String): String = {
+    sql.replace("$", "\\$")
+  }
+
   def keyWordsToUpper(sql: String): String = {
     SQL_KEY_WORDS
       .map(_.toLowerCase)
