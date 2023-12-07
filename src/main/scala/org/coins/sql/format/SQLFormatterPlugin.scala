@@ -15,8 +15,6 @@ object SQLFormatterPlugin extends AutoPlugin {
 
   override def trigger: PluginTrigger = allRequirements
 
-  private val replacementMapping = Map("$" -> UUID.randomUUID)
-
   override def projectSettings: Seq[Setting[_]] = Seq(
     formatSQL := {
       val log = streams.value.log
@@ -48,18 +46,16 @@ object SQLFormatterPlugin extends AutoPlugin {
   }
 
   def formatSQLInString(content: String): String = {
-    val replacedContent: String = content.replace("$", replacementMapping("$").toString)
-    val sqlPattern = """\"{3}(?si)([^"]*?select[^"]*?)\"{3}""".r
+    val sqlPattern = """"{3}(?si)([^"]*?select[^"]*?)"{3}""".r
     sqlPattern
       .replaceAllIn(
-        replacedContent,
+        content,
         m => {
           val sql = m.group(1)
           val formattedSQL = formatSQLString(sql)
           s"""\"\"\"$formattedSQL\"\"\".stripMargin"""
         }
       )
-      .replace(replacementMapping("$").toString, "$")
   }
 
   def formatSQLString(sql: String): String = {
@@ -77,6 +73,7 @@ object SQLFormatterPlugin extends AutoPlugin {
       .map(selectFieldsAlignedToNewLine)
       .map(cteAlignedByWithKeyword)
       .map(applyCustomLeftIndent(_, customLeftIndent))
+      .map(escapeDollarSign)
       .getOrElse(
         throw new RuntimeException(
           "Unexpected behaviour: function `formatSQLString` should return String!"

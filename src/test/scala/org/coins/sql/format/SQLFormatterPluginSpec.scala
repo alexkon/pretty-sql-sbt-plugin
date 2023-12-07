@@ -114,8 +114,8 @@ ${customLeftIndent}  FROM people"""
     *   2. SQL wrapped in single double quotes will not be formatted
     */
   "formatSQLInString" should "support situations as comments mentioned" in {
-    val threeDoubleQuotes = "\"\"\""
-    val dollar_sign = "$"
+    val tripleQuote = "\"\"\""
+    val dollarSign = "$"
     val content =
       s"""package xx.xx.xx
          |object xxxJob {
@@ -124,10 +124,10 @@ ${customLeftIndent}  FROM people"""
          |    val str = "string should not be impacted"
          |    val sql1 = "  select * from user"
          |    spark.sql("select * from user")
-         |    spark.sql($threeDoubleQuotes select * from user$threeDoubleQuotes)
-         |    val sql2 = s$threeDoubleQuotes
+         |    spark.sql($tripleQuote select * from user$tripleQuote)
+         |    val sql2 = s$tripleQuote
          |                 |-- this is a comment
-         |                 |select *, ${dollar_sign}date dt from people$threeDoubleQuotes
+         |                 |select *, ${dollarSign}date dt from people$tripleQuote
          |  }
          |}""".stripMargin
     val actualFormattedContent: String = formatSQLInString(content)
@@ -139,13 +139,13 @@ ${customLeftIndent}  FROM people"""
                             |    val str = "string should not be impacted"
                             |    val sql1 = "  select * from user"
                             |    spark.sql("select * from user")
-                            |    spark.sql($threeDoubleQuotes
+                            |    spark.sql($tripleQuote
                             |        |SELECT *
-                            |        |  FROM user$threeDoubleQuotes.stripMargin)
-                            |    val sql2 = s$threeDoubleQuotes-- this is a comment
+                            |        |  FROM user$tripleQuote.stripMargin)
+                            |    val sql2 = s$tripleQuote-- this is a comment
                             |                 |SELECT *,
-                            |                 |       $$date dt
-                            |                 |  FROM people$threeDoubleQuotes.stripMargin
+                            |                 |       ${dollarSign}date dt
+                            |                 |  FROM people$tripleQuote.stripMargin
                             |  }
                             |}""".stripMargin
 
