@@ -2,7 +2,6 @@ package org.coins.sql.format
 
 import sbt.Keys._
 import sbt._
-import java.util.UUID
 
 object SQLFormatterPlugin extends AutoPlugin {
 
