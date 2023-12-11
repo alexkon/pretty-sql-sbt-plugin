@@ -3,6 +3,7 @@ package org.coins.sql.format
 import org.coins.sql.format.regex.RegexHelper._
 
 import scala.collection.mutable
+import java.util.UUID
 
 object SQLFormatter {
 
@@ -27,6 +28,9 @@ object SQLFormatter {
   private val SQL_KEY_WORDS = SQL_KEY_WORDS_STARTED_WITH_NEW_LINE ++ SQL_KEY_WORDS_OTHERS
   private val DEFAULT_LEFT_INDENT = " " * 8 + "|" // 8-space indentation with |
 
+  private[format] var strLiteralsWithKeyWordsMapping: mutable.Map[String, String] =
+    mutable.Map.empty
+
   def findCustomLeftIndent(sql: String): Option[String] = {
     "^(\\s+\\|)".r.findFirstMatchIn(sql).map(m => m.matched.replace("\n", ""))
   }
@@ -41,6 +45,40 @@ object SQLFormatter {
 
   def escapeDollarSign(sql: String): String = {
     sql.replace("$", "\\$")
+  }
+
+  def replaceStrLiteralsWithKeyWords(sql: String): String = {
+    var replacedSql = sql
+    val uuid = UUID.randomUUID().toString
+    val regex = """'[^']*'""".r
+    val stringLiterals = regex.findAllIn(sql).map(_.trim).mkString(",")
+    val stringLiteralArr: Set[String] =
+      stringLiterals.split(",").toSet
+    val sqlKeywords = s"""${SQL_KEY_WORDS.mkString("|")}""".r
+
+    for (stringLiteral <- stringLiteralArr) {
+      if (sqlKeywords.findFirstIn(stringLiteral.toUpperCase).isDefined) {
+        strLiteralsWithKeyWordsMapping.update(
+          stringLiteral,
+          stringLiteral.replaceAll("\\s", "").replace("'", "_") + uuid
+        )
+        replacedSql =
+          replacedSql.replaceAll(stringLiteral, strLiteralsWithKeyWordsMapping(stringLiteral))
+      }
+    }
+
+    replacedSql
+  }
+
+  def recoverStrLiteralsWithKeyWords(sql: String): String = {
+    var recoveredSql = sql
+    if (strLiteralsWithKeyWordsMapping != mutable.Map.empty) {
+      for ((k, v) <- strLiteralsWithKeyWordsMapping) {
+        recoveredSql = recoveredSql.replaceAll(v, k)
+      }
+      strLiteralsWithKeyWordsMapping.clear
+    }
+    recoveredSql
   }
 
   def keyWordsToUpper(sql: String): String = {
