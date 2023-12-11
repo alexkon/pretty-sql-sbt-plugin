@@ -51,7 +51,7 @@ object SQLFormatter {
     var replacedSql = sql
     val uuid = UUID.randomUUID().toString
     val regex = """'[^']*'""".r
-    val stringLiterals = regex.findAllIn(sql).map(_.trim).mkString(",")
+    val stringLiterals = regex.findAllIn(sql).mkString(",")
     val stringLiteralArr: Set[String] =
       stringLiterals.split(",").toSet
     val sqlKeywords = s"""${SQL_KEY_WORDS.mkString("|")}""".r
