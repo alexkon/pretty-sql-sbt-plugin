@@ -159,4 +159,18 @@ class SQLFormatterSpec extends FlatSpec with Matchers {
 
     actualFormattedString shouldBe expectedSQl
   }
+
+  """After the input string is processed synchronously
+    |by replaceStringLiteralsWithKeyWords
+    |and recoverStrLiteralsWithKeyWords""" should "remain consistent with the original" in {
+    val inputSQL =
+      """
+        |SELECT 'select', 'a from  b' as 'from alias'
+        |FROM SELECTION""".stripMargin
+
+    val replacedStr = SQLFormatter.replaceStrLiteralsWithKeyWords(inputSQL)
+    val recoveredStr = SQLFormatter.recoverStrLiteralsWithKeyWords(replacedStr)
+
+    inputSQL shouldBe recoveredStr
+  }
 }

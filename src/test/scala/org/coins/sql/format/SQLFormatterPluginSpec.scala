@@ -110,9 +110,11 @@ ${customLeftIndent}  FROM people"""
   }
 
   /** `formatSQLInString` needs to implement the following features at the same time：
-    *   1. none SQL string should not be affected.
-    *   2. SQL wrapped in single double quotes will not be formatted
-    */
+   *   1. none SQL string should not be affected.
+   *   2. SQL wrapped in single double quotes will not be formatted.
+   *   3. dollar sign should be properly handled.
+   *   4. string literals with SQL key words should be properly handled.
+   */
   "formatSQLInString" should "support situations as comments mentioned" in {
     val tripleQuote = "\"\"\""
     val dollarSign = "$"
@@ -127,7 +129,7 @@ ${customLeftIndent}  FROM people"""
          |    spark.sql($tripleQuote select * from user$tripleQuote)
          |    val sql2 = s$tripleQuote
          |                 |-- this is a comment
-         |                 |select *, ${dollarSign}date dt from people$tripleQuote
+         |                 |select *, ${dollarSign}date dt, 'select', ' from a ' from people$tripleQuote
          |  }
          |}""".stripMargin
     val actualFormattedContent: String = formatSQLInString(content)
@@ -144,7 +146,9 @@ ${customLeftIndent}  FROM people"""
                             |        |  FROM user$tripleQuote.stripMargin)
                             |    val sql2 = s$tripleQuote-- this is a comment
                             |                 |SELECT *,
-                            |                 |       ${dollarSign}date dt
+                            |                 |       ${dollarSign}date dt,
+                            |                 |       'select',
+                            |                 |       ' from a '
                             |                 |  FROM people$tripleQuote.stripMargin
                             |  }
                             |}""".stripMargin
