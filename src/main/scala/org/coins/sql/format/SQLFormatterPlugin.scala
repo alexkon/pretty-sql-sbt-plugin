@@ -1,6 +1,6 @@
 package org.coins.sql.format
 
-import org.coins.sql.format.regex.RegexHelper.getStringLiteralMap
+import org.coins.sql.format.regex.RegexHelper.literalReplacementMap
 import sbt.Keys._
 import sbt._
 
@@ -62,10 +62,10 @@ object SQLFormatterPlugin extends AutoPlugin {
     import SQLFormatter._
 
     val customLeftIndent: Option[String] = findCustomLeftIndent(sql)
-    val stringLiteralMap: Map[String, String] =  getStringLiteralMap(sql)
+    val stringLiteralMap: Map[String, String] =  literalReplacementMap(sql)
 
     Some(sql)
-      .map(replaceLiteralsWithSpecialKeys)
+      .map(replaceLiterals)
       .map(minifySqlString)
       .map(keyWordsToUpper)
       .map(cteNewLineSeparated)
@@ -76,7 +76,7 @@ object SQLFormatterPlugin extends AutoPlugin {
       .map(cteAlignedByWithKeyword)
       .map(applyCustomLeftIndent(_, customLeftIndent))
       .map(escapeDollarSign)
-      .map(recoverLiteralsWithSpecialKeys(_, stringLiteralMap))
+      .map(recoverLiterals(_, stringLiteralMap))
       .getOrElse(
         throw new RuntimeException(
           "Unexpected behaviour: function `formatSQLString` should return String!"

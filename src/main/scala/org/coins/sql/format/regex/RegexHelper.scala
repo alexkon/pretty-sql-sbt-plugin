@@ -80,7 +80,7 @@ object RegexHelper {
     }
   }
 
-  def getStringLiteralMap(sql: String): Map[String, String] = {
+  def literalReplacementMap(sql: String): Map[String, String] = {
     STRING_LITERAL_REGEXP.findAllIn(sql).zipWithIndex.map{ case (str, index) => (s"'s$index'", str)}.toMap
   }
 }

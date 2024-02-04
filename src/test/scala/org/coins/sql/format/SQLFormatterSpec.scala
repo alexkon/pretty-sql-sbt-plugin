@@ -161,36 +161,36 @@ class SQLFormatterSpec extends FlatSpec with Matchers {
     actualFormattedString shouldBe expectedSQl
   }
 
-  "getStringLiteralMap function" should "return key-value Map with key: ('s<index>') and value: ('<literal>')" in {
+  "literalReplacementMap function" should "return key-value Map with key: ('s<index>') and value: ('<literal>')" in {
     val inputSQL = """select 'select a from b' as sql1, 'select c from d' as sql2 from selection"""
     val expectedMap = Map("'s0'" -> "'select a from b'", "'s1'" -> "'select c from d'")
 
-    val actualMap = RegexHelper.getStringLiteralMap(inputSQL)
+    val actualMap = RegexHelper.literalReplacementMap(inputSQL)
     actualMap shouldBe expectedMap
   }
 
-  "replaceStrLiteralsWithSpecialKeys function" should "return SQL all string literal replaced by keys ('s<index>')'" in {
+  "replaceLiterals function" should "return SQL all string literal replaced by keys ('s<index>')'" in {
     val inputSQL = """select 'select a from b' as sql1, 'select c from d' as sql2 from selection"""
     val expectedSQl = """select 's0' as sql1, 's1' as sql2 from selection"""
 
-    val actualFormattedString = SQLFormatter.replaceLiteralsWithSpecialKeys(inputSQL)
+    val actualFormattedString = SQLFormatter.replaceLiterals(inputSQL)
     actualFormattedString shouldBe expectedSQl
   }
 
-  "recoverStrLiteralsWithSpecialKeys function" should "return SQL string recoverd by stringLiteralTempMap " in {
+  "recoverLiterals function" should "return SQL string recoverd by stringLiteralTempMap " in {
     val inputSQL = """select 's0' as sql1, 's1' as sql2 from selection"""
     val expectedSQl = """select 'select a from b' as sql1, 'select c from d' as sql2 from selection"""
     val replacementMap = Map("'s0'" -> "'select a from b'", "'s1'" -> "'select c from d'")
 
-    val actualFormattedString = SQLFormatter.recoverLiteralsWithSpecialKeys(inputSQL, replacementMap)
+    val actualFormattedString = SQLFormatter.recoverLiterals(inputSQL, replacementMap)
     actualFormattedString shouldBe expectedSQl
   }
 
-  "functions replaceStrLiteralsWithSpecialKeys and recoverStrLiteralsWithSpecialKeys" should "return original string after sequential apply" in {
+  "functions recoverLiterals and recoverLiterals" should "return original string after sequential apply" in {
     val inputSQL = """select 'select a from b' as sql1, 'select c from d' as sql2 from selection"""
 
-    val replacedStr = SQLFormatter.replaceLiteralsWithSpecialKeys(inputSQL)
-    val recoveredStr = SQLFormatter.recoverLiteralsWithSpecialKeys(replacedStr, RegexHelper.getStringLiteralMap(inputSQL))
+    val replacedStr = SQLFormatter.replaceLiterals(inputSQL)
+    val recoveredStr = SQLFormatter.recoverLiterals(replacedStr, RegexHelper.literalReplacementMap(inputSQL))
 
     inputSQL shouldBe recoveredStr
   }
