@@ -62,7 +62,7 @@ object SQLFormatterPlugin extends AutoPlugin {
     import SQLFormatter._
 
     val customLeftIndent: Option[String] = findCustomLeftIndent(sql)
-    val stringLiteralMap: Map[String, String] =  literalReplacementMap(sql)
+    val literalMap: Map[String, String] =  literalReplacementMap(sql)
 
     Some(sql)
       .map(replaceLiterals)
@@ -76,7 +76,7 @@ object SQLFormatterPlugin extends AutoPlugin {
       .map(cteAlignedByWithKeyword)
       .map(applyCustomLeftIndent(_, customLeftIndent))
       .map(escapeDollarSign)
-      .map(recoverLiterals(_, stringLiteralMap))
+      .map(recoverLiterals(_, literalMap))
       .getOrElse(
         throw new RuntimeException(
           "Unexpected behaviour: function `formatSQLString` should return String!"
