@@ -1,5 +1,6 @@
 package org.coins.sql.format
 
+import org.coins.sql.format.regex.RegexHelper
 import org.scalatest.flatspec.{AnyFlatSpec => FlatSpec}
 import org.scalatest.matchers.should.Matchers
 
@@ -158,5 +159,39 @@ class SQLFormatterSpec extends FlatSpec with Matchers {
     val actualFormattedString = SQLFormatter.cteAlignedByWithKeyword(inputSQL)
 
     actualFormattedString shouldBe expectedSQl
+  }
+
+  "getStringLiteralMap function" should "return key-value Map with key: ('s<index>') and value: ('<literal>')" in {
+    val inputSQL = """select 'select a from b' as sql1, 'select c from d' as sql2 from selection"""
+    val expectedMap = Map("'s0'" -> "'select a from b'", "'s1'" -> "'select c from d'")
+
+    val actualMap = RegexHelper.getStringLiteralMap(inputSQL)
+    actualMap shouldBe expectedMap
+  }
+
+  "replaceStrLiteralsWithSpecialKeys function" should "return SQL all string literal replaced by keys ('s<index>')'" in {
+    val inputSQL = """select 'select a from b' as sql1, 'select c from d' as sql2 from selection"""
+    val expectedSQl = """select 's0' as sql1, 's1' as sql2 from selection"""
+
+    val actualFormattedString = SQLFormatter.replaceLiteralsWithSpecialKeys(inputSQL)
+    actualFormattedString shouldBe expectedSQl
+  }
+
+  "recoverStrLiteralsWithSpecialKeys function" should "return SQL string recoverd by stringLiteralTempMap " in {
+    val inputSQL = """select 's0' as sql1, 's1' as sql2 from selection"""
+    val expectedSQl = """select 'select a from b' as sql1, 'select c from d' as sql2 from selection"""
+    val replacementMap = Map("'s0'" -> "'select a from b'", "'s1'" -> "'select c from d'")
+
+    val actualFormattedString = SQLFormatter.recoverLiteralsWithSpecialKeys(inputSQL, replacementMap)
+    actualFormattedString shouldBe expectedSQl
+  }
+
+  "functions replaceStrLiteralsWithSpecialKeys and recoverStrLiteralsWithSpecialKeys" should "return original string after sequential apply" in {
+    val inputSQL = """select 'select a from b' as sql1, 'select c from d' as sql2 from selection"""
+
+    val replacedStr = SQLFormatter.replaceLiteralsWithSpecialKeys(inputSQL)
+    val recoveredStr = SQLFormatter.recoverLiteralsWithSpecialKeys(replacedStr, RegexHelper.getStringLiteralMap(inputSQL))
+
+    inputSQL shouldBe recoveredStr
   }
 }
