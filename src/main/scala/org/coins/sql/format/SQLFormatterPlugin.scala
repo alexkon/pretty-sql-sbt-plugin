@@ -62,7 +62,7 @@ object SQLFormatterPlugin extends AutoPlugin {
     import SQLFormatter._
 
     val customLeftIndent: Option[String] = findCustomLeftIndent(sql)
-    val literalMap: Map[String, String] =  literalReplacementMap(sql)
+    val literalMap: Map[String, String] = literalReplacementMap(sql)
 
     Some(sql)
       .map(replaceLiterals)

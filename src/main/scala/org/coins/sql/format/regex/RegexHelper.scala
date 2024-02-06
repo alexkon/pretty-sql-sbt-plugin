@@ -81,6 +81,10 @@ object RegexHelper {
   }
 
   def literalReplacementMap(sql: String): Map[String, String] = {
-    STRING_LITERAL_REGEXP.findAllIn(sql).zipWithIndex.map{ case (str, index) => (s"'s$index'", str)}.toMap
+    STRING_LITERAL_REGEXP
+      .findAllIn(sql)
+      .zipWithIndex
+      .map { case (str, index) => (s"'s$index'", str) }
+      .toMap
   }
 }
