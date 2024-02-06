@@ -75,8 +75,8 @@ object SQLFormatterPlugin extends AutoPlugin {
       .map(selectFieldsAlignedToNewLine)
       .map(cteAlignedByWithKeyword)
       .map(applyCustomLeftIndent(_, customLeftIndent))
-      .map(escapeDollarSign)
       .map(recoverLiterals(_, literalMap))
+      .map(escapeDollarSign)
       .getOrElse(
         throw new RuntimeException(
           "Unexpected behaviour: function `formatSQLString` should return String!"
