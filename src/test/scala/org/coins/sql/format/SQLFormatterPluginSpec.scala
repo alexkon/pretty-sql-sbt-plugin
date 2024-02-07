@@ -127,7 +127,7 @@ ${customLeftIndent}  FROM people"""
          |    spark.sql($tripleQuote select * from user$tripleQuote)
          |    val sql2 = s$tripleQuote
          |                 |-- this is a comment
-         |                 |select *, ${dollarSign}date dt from people$tripleQuote
+         |                 |select *, 'select a, ${dollarSign}date from b' as sql1, ${dollarSign}date dt from people$tripleQuote
          |  }
          |}""".stripMargin
     val actualFormattedContent: String = formatSQLInString(content)
@@ -144,6 +144,7 @@ ${customLeftIndent}  FROM people"""
                             |        |  FROM user$tripleQuote.stripMargin)
                             |    val sql2 = s$tripleQuote-- this is a comment
                             |                 |SELECT *,
+                            |                 |       'select a, ${dollarSign}date from b' AS sql1,
                             |                 |       ${dollarSign}date dt
                             |                 |  FROM people$tripleQuote.stripMargin
                             |  }

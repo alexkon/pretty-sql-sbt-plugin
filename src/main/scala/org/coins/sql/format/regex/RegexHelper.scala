@@ -5,6 +5,7 @@ import scala.util.matching.Regex
 
 object RegexHelper {
   val KEY_INSENSITIVE_KEY = "(?i)"
+  val STRING_LITERAL_REGEXP: Regex = """'[^']*'""".r
 
   def replaceWord(
       wordOld: String,
@@ -77,5 +78,13 @@ object RegexHelper {
       case Some(index) => Some(lines.size - 1 - index)
       case None        => firstMatch
     }
+  }
+
+  def literalReplacementMap(sql: String): Map[String, String] = {
+    STRING_LITERAL_REGEXP
+      .findAllIn(sql)
+      .zipWithIndex
+      .map { case (str, index) => (s"'s$index'", str) }
+      .toMap
   }
 }

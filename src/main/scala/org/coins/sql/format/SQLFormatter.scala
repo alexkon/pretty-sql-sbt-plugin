@@ -149,4 +149,23 @@ object SQLFormatter {
     }
     replaceHighLevelSymbol(withoutLastSelectSql, ',', ",\n\n") + lastSelectSql
   }
+
+  def replaceLiteralsWithMap(
+      sql: String,
+      replacements: Map[String, String],
+      replaceByValue: Boolean
+  ): String = {
+    replacements.foldLeft(sql) { case (currentSql, (key, value)) =>
+      if (replaceByValue) currentSql.replaceAllLiterally(value, key)
+      else currentSql.replaceAllLiterally(key, value)
+    }
+  }
+
+  def replaceLiterals(sql: String): String = {
+    replaceLiteralsWithMap(sql, literalReplacementMap(sql), replaceByValue = true)
+  }
+
+  def recoverLiterals(sql: String, map: Map[String, String]): String = {
+    replaceLiteralsWithMap(sql, map, replaceByValue = false)
+  }
 }

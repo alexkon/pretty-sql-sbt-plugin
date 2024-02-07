@@ -1,5 +1,6 @@
 package org.coins.sql.format
 
+import org.coins.sql.format.regex.RegexHelper.literalReplacementMap
 import sbt.Keys._
 import sbt._
 
@@ -61,8 +62,10 @@ object SQLFormatterPlugin extends AutoPlugin {
     import SQLFormatter._
 
     val customLeftIndent: Option[String] = findCustomLeftIndent(sql)
+    val literalMap: Map[String, String] = literalReplacementMap(sql)
 
     Some(sql)
+      .map(replaceLiterals)
       .map(minifySqlString)
       .map(keyWordsToUpper)
       .map(cteNewLineSeparated)
@@ -72,6 +75,7 @@ object SQLFormatterPlugin extends AutoPlugin {
       .map(selectFieldsAlignedToNewLine)
       .map(cteAlignedByWithKeyword)
       .map(applyCustomLeftIndent(_, customLeftIndent))
+      .map(recoverLiterals(_, literalMap))
       .map(escapeDollarSign)
       .getOrElse(
         throw new RuntimeException(
